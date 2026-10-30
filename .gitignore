@@ -1,0 +1,18 @@
+node_modules/
+.wrangler/
+.dev.vars
+.env*
+!.env.example
+*.dpapi
+*-private.*
+coverage/
+artifacts/
+
+# Historical local audit probes and machine-specific review notes.
+/audit/
+/SECURITY-REVIEW.md
+
+# Local documentation build output
+
+# 本机专用部署配置
+/wrangler.jsonc
