@@ -1,6 +1,22 @@
 # 安全修复与部署记录
 
-本次升级将生产执行路径切换为 Docker，并按所有者要求完整读写 `D:\Projects`。最新控制通道修复的验收结果见 `artifacts/fix-final-01/`；此前完整升级结果保留在 `artifacts/hardening-deployment.json`、`artifacts/hardening-tests.txt`。
+本项目的执行路径使用 Docker，并按所有者要求完整读写 `D:\Projects`。下列记录区分代码回归、运行副本核对和云端补验；历史章节保留各次验证时的状态，不能当作持续在线或无漏洞的保证。详细日志保存在本机忽略目录，不随仓库发布。
+
+## 验证快照（2026-10-30 23:57 +08:00）
+
+对应已签名并推送的代码提交 `8e4afdd2e62ff6f6e2fd58cada0a2b75a50abcc8`。2026-10-31 的文档和 GPLv3 许可元数据整理沿用下列已核验结果；文档校验和站点构建属于单独验证，不代表重新执行了业务测试或重新部署。
+
+| 验证范围 | 已确认结果 | 本机证据 |
+| --- | --- | --- |
+| 固定镜像完整回归 | 101 项通过，0 失败、0 跳过；初次 PowerShell 原生崩溃后，受影响测试及最终整套重跑均通过 | `artifacts/fix-final-01/full-tests.txt`、`secret-recheck.txt` |
+| 公网实际操作 | 9 项通过，覆盖 OAuth、本机精确批准、容器文件与命令、刷新及临时授权撤销 | `artifacts/fix-final-01/public-acceptance.json` |
+| 补充并发与授权边界 | 4 项通过；没有重跑上述完整回归 | `artifacts/release-review-8e4afdd/control-concurrency.txt`、`auth-long-client-result.txt` |
+| 本机运行副本 | 28 个文件与安装清单及源码一致；固定 Node 摘要、私有路径权限和运行进程身份通过核对 | `artifacts/release-review-8e4afdd/runtime-files.json`、`host-verification.json` |
+| 云端实际部署 | 当前部署承接 100% 流量；活动版本与下载源码 ETag 一致，7 个云端模块逐字匹配当前源码，域名绑定正确 | `artifacts/release-review-8e4afdd/after-login-verification.json`、`version-binding.json` |
+| 公网健康 | 返回 200，连接器在线 | `artifacts/release-review-8e4afdd/runtime-cloud-health.json` |
+| 生产 npm 依赖 | 扫描结果为 0 已知漏洞；未覆盖镜像内所有系统包 | `artifacts/release-review-8e4afdd/dependency-audit.json` |
+
+云端部署版本为 `475326d6-3c83-438c-89ae-a91636fd935c`。管理登录过期造成的云端版本核验缺口，已在重新登录后补验关闭。审查没有发现新增、可确认的漏洞或阻断性 Bug；完整审查记录为 `artifacts/release-review-8e4afdd/review.json`。真实 ChatGPT 账号连接仍未代替用户完成。
 
 ## 最终审查问题修复（2026-10-30）
 
