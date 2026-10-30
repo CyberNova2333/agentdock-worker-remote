@@ -2,6 +2,7 @@
   "name": "agentdock-bridge",
   "version": "2.0.0",
   "private": true,
+  "license": "GPL-3.0-only",
   "type": "module",
   "description": "Personal authenticated MCP connection from ChatGPT to a Windows workspace",
   "engines": {

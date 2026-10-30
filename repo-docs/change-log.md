@@ -1,26 +1,6 @@
 # 指南变更记录
 
-## 2026-10-30 23:27 +08:00：保留清理故障后的任务控制
-
-- 触发：最终审查发现清理故障同时封锁已有任务查询和停止；同步决策为 `foreground patch`。
-- 中英 README 和主流程说明故障时只拒绝新命令、文件操作，保留所属客户端对已有任务的查询与停止；取消和权限校验继续生效。
-- 证据表记录控制分支与关闭检查的顺序。未确认清理仍按失败报告，不自动重试；容器时限和可信本机停止入口继续有效。
-- 本条基于下列提交及本次修复工作树的源码核对；实际业务测试、运行副本更新与部署结果另见根目录 `SECURITY-FIXES.md`。
-- 验证：`validate_repo_docs.py --lite` 退出 0，0 errors、0 warnings；日志在 `artifacts/fix-final-01/repo-docs-validation.txt`。
-
-Synced through 5ded65ef08bb6e15b81ce1e22b7fe66dda567abb
-
-## 2026-10-30：同步第五轮修复的使用入口与批准预算
-
-- 触发：安全与批准流程修复；同步决策为 `foreground patch`，保留 Lite 指南范围。
-- 中英 README 与指南入口改为默认 `%USERPROFILE%\.agentdock-bridge`；说明所有者及祖先路径检查、旧状态迁移后重发待批准请求，以及本轮保留连接密码与授权代次。
-- 主流程补充紧凑 JSON 的最终字节预算与超限拒绝，所有参数和元数据仍完整绑定；代码地图补充只读 Docker 初始化查询策略及验证入口。
-- 定向核对当前管理脚本、批准存储、连接器和 Docker 查询源码；不把文档更新当作迁移或生产验收。实际测试与部署结果见根目录 `SECURITY-FIXES.md`。
-- 验证：`validate_repo_docs.py --lite` 退出 0，0 errors、1 warning；日志在 `artifacts/fix-round5/repo-docs-validation.txt`。唯一提示为缺少同步 SHA：同步时仓库尚无首个提交、HEAD 不存在，不伪造同步值。
-
-首次签名提交建立后补齐同步锚点；后续变更仅整理换行和本条记录，不改变运行行为。
-
-Synced through 9b483eebeeadd90b98bc01c8a71a3daf4bdbd93b
+条目按时间先后排列，最新记录位于末尾。历史条目保留当时的仓库和验证状态；其中“无首个提交”及 MkDocs 记录不代表当前配置。当前使用与源码阅读从[指南入口](README.md)开始，运行验证按[修复与验证快照](../SECURITY-FIXES.md)中的版本和时间解释。
 
 ## 2026-10-29：建立主流程指南并对齐文档入口
 
@@ -46,3 +26,36 @@ Synced through：不可用（尚无首个提交，HEAD 不存在；以本次工�
 ## 文档站恢复默认主题（2026-10-29）
 
 按用户要求统一使用 VitePress 默认主题，移除额外配色、字体、圆角和入场动效。指南正文、源码定位及导航保留；文档依赖与业务依赖分开。新建站点从 MkDocs 迁移为 VitePress，既有两个 VitePress 站点使用原生主题入口。
+## 2026-10-30：同步第五轮修复的使用入口与批准预算
+
+- 触发：安全与批准流程修复；同步决策为 `foreground patch`，保留 Lite 指南范围。
+- 中英 README 与指南入口改为默认 `%USERPROFILE%\.agentdock-bridge`；说明所有者及祖先路径检查、旧状态迁移后重发待批准请求，以及本轮保留连接密码与授权代次。
+- 主流程补充紧凑 JSON 的最终字节预算与超限拒绝，所有参数和元数据仍完整绑定；代码地图补充只读 Docker 初始化查询策略及验证入口。
+- 定向核对当前管理脚本、批准存储、连接器和 Docker 查询源码；不把文档更新当作迁移或生产验收。实际测试与部署结果见根目录 `SECURITY-FIXES.md`。
+- 验证：`validate_repo_docs.py --lite` 退出 0，0 errors、1 warning；日志在 `artifacts/fix-round5/repo-docs-validation.txt`。唯一提示为缺少同步 SHA：同步时仓库尚无首个提交、HEAD 不存在，不伪造同步值。
+
+首次签名提交建立后补齐同步锚点；后续变更仅整理换行和本条记录，不改变运行行为。
+
+Synced through 9b483eebeeadd90b98bc01c8a71a3daf4bdbd93b
+
+## 2026-10-30 23:27 +08:00：保留清理故障后的任务控制
+
+- 触发：最终审查发现清理故障同时封锁已有任务查询和停止；同步决策为 `foreground patch`。
+- 中英 README 和主流程说明故障时只拒绝新命令、文件操作，保留所属客户端对已有任务的查询与停止；取消和权限校验继续生效。
+- 证据表记录控制分支与关闭检查的顺序。未确认清理仍按失败报告，不自动重试；容器时限和可信本机停止入口继续有效。
+- 本条基于下列提交及本次修复工作树的源码核对；实际业务测试、运行副本更新与部署结果另见根目录 `SECURITY-FIXES.md`。
+- 验证：`validate_repo_docs.py --lite` 退出 0，0 errors、0 warnings；日志在 `artifacts/fix-final-01/repo-docs-validation.txt`。
+
+Synced through 5ded65ef08bb6e15b81ce1e22b7fe66dda567abb
+
+## 2026-10-31 00:07 +08:00：规范指南并对齐验证快照
+
+- 触发：用户要求按 `repo-docs` 规范项目文档、提交信息和双语 README；采用 widened docs sync，前台决策为 `foreground patch`，保留 Lite 加代码地图的阅读范围。
+- 指南入口区分源码、运行副本、镜像和版本验收；主流程补充客户端 RPC ID 与桥接请求 ID 的用途，以及批准、预算和故障恢复的局部验证入口。
+- 代码地图修正沙箱与工具运行器的符号归属，补齐本机批准、文件策略、云端入口和运维脚本的改动导航，明确文档站与维护工具不参与主请求路径。
+- 证据与质量审计移除过时的当前状态断言，统一链接已有验证快照。云端管理登录恢复后的部署补验已完成，不再保留为未解决缺口；历史记录仍保留原有语境。
+- 项目已获授权采用 GNU GPLv3，指南许可说明链接根目录 `LICENSE`，标识为 `GPL-3.0-only`。
+- 验证：文档结构与链接校验退出 0，0 errors、0 warnings；VitePress 默认主题站点构建通过。两个包及锁文件的许可字段一致，依赖内容未变，完整 `LICENSE` 与下载源摘要一致。日志保存在本机 `artifacts/docs-normalization-20261031/`。
+- 验证范围：重新核对实际源码、精确符号、回归断言和已保存验收记录；本轮未执行业务回归、服务启停或部署。包许可元数据已更新，运行副本的 28 文件一致性仍按 `8e4afdd` 的既有快照解释。
+
+Synced through 8e4afdd2e62ff6f6e2fd58cada0a2b75a50abcc8

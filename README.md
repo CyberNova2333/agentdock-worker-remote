@@ -2,98 +2,162 @@
 
 [English](README.en.md) · [中文源码指南](repo-docs/README.md)
 
-独立实现的个人 MCP 网关。Cloudflare Worker 负责 OAuth 和中转；Windows 上的受保护连接器负责本地批准与容器生命周期；Linux 开发容器处理工程文件及命令。
+AgentDock Bridge 是自行管理 Windows 工程环境的个人 MCP 网关。MCP 客户端通过 Cloudflare Worker 完成 OAuth 授权并发送工具请求；Windows 受保护连接器核对权限、收取本机批准；Linux 开发容器读取工程文件或运行 Bash，再经网关返回结果。
 
-入口由本机部署配置的 `PUBLIC_ORIGIN` 决定，MCP 路径为 `/mcp`，认证方式 OAuth。
+适用于需要远程使用本机开发环境、同时保留本机精确批准的人。电脑、连接器与 Docker 必须在线，工具执行依赖这台 Windows 主机。
+
+## 阅读路径
+
+| 读者目标 | 从这里开始 | 读完后获得什么 |
+| --- | --- | --- |
+| 部署并开始使用 | 本页的前置条件、首次配置与安装、日常使用 | 配置自己的网关并找到可信管理入口 |
+| 理解一次请求 | [一条真实主流程](repo-docs/walkthroughs/one-real-run.md) | 看懂授权、批准、执行与返回的交接 |
+| 寻找改动入口 | [代码地图](repo-docs/code-map.md) | 定位源码职责和对应验证 |
+| 核对证据与限制 | [源码调查记录](repo-docs/references/source-evidence.md)与[修复和验收记录](SECURITY-FIXES.md) | 区分源码事实、测试结果和生产验收 |
+| 参与维护 | [贡献指南](CONTRIBUTING.md)与[安全说明](SECURITY.md) | 了解提交信息、签名及离线安全检查 |
+
+## 前置条件
+
+- Windows x64、Windows PowerShell 和 .NET Framework，用于 DPAPI 凭证与本机权限检查。
+- Docker Desktop 的 Linux 容器引擎；安装脚本使用本机 `desktop-linux` context。
+- 可信的 Node.js 24+ 和 npm，用于检出目录的依赖、开发检查与 Wrangler。安装器会为宿主运行副本另行安装并校验固定版本 Node。
+- 自己的 Cloudflare 账户、Wrangler 登录和可用的 HTTPS 域名。Worker 使用 SQLite Durable Objects。
+- 一个明确允许容器完整读写的工程目录。当前默认是整个 `D:\Projects`，映射到 `/workspace`。
+
+需要修改提交钩子或运行文档校验时，还需 Python 3.10+。源码、宿主运行副本和容器镜像分别管理，检出目录不是日常可信控制入口。
+
+## 首次配置与安装
+
+以下命令在已审阅的检出目录内执行，仅用于新安装。已有配置会被初始化脚本拒绝；升级已有安装请阅读后面的开发和更新说明。
+
+1. 安装开发依赖，并创建本机部署配置：
+
+   ```powershell
+   npm.cmd ci
+   Copy-Item wrangler.jsonc.example wrangler.jsonc
+   .\node_modules\.bin\wrangler.cmd login
+   ```
+
+   编辑 `wrangler.jsonc`，核对目标账户、Worker 名称、域名绑定和 `PUBLIC_ORIGIN`。模板中的 `https://bridge.example.test` 必须换成自己的真实 HTTPS 地址；模板未包含特定账户和自定义域名路由。该配置不入版本控制。
+
+   核对部署脚本后再用于自己的域名：当前 `Manage.ps1` 的公网状态探针和 `Secrets.ps1` 的密码窗口标题仍含部署专用地址。核心连接地址来自本机 `origin` 与 Worker 的 `PUBLIC_ORIGIN`；移植时也应调整这些提示和状态探针。
+
+2. 显式指定同一个公开地址，初始化本机加密凭证并构建开发镜像：
+
+   ```powershell
+   powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -File .\scripts\Setup.ps1 -Origin https://bridge.example.test -Roots D:\Projects
+   docker.exe --context desktop-linux build -f container/Dockerfile -t agentdock-dev:2026-10-28 .
+   ```
+
+   `Setup.ps1` 只初始化凭证和配置，默认私有目录为 `%USERPROFILE%\.agentdock-bridge`，此时尚不能启动工具执行。先把示例地址与工程目录改成自己的值。状态目录及其祖先必须通过所有者和写入权限检查。
+
+3. 部署 Worker，并上传本项目所需的连接秘密：
+
+   ```powershell
+   .\node_modules\.bin\wrangler.cmd deploy
+   powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -File .\scripts\Secrets.ps1 -Action Upload
+   ```
+
+   上传通过内存管道传递 `BRIDGE_TOKEN` 和 `OWNER_PASSWORD_HASH`。本机密码与 DPAPI 文件不提交到仓库，也不要贴进聊天。此步骤使用已审阅检出目录中的 Wrangler、部署配置和登录状态。
+
+4. 安装受保护的宿主运行副本，再从私有目录启动：
+
+   ```powershell
+   powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -File .\scripts\Install-Hardened.ps1 -Workspace D:\Projects -Image agentdock-dev:2026-10-28
+   & (Join-Path $env:USERPROFILE '.agentdock-bridge\Start.cmd')
+   ```
+
+   安装器复制连接器及生产依赖、固定镜像 SHA-256，并生成可信管理入口；它不负责部署 Worker 或创建域名。首次安装会下载并校验宿主 Node 的固定官方版本。需要代理时，安装脚本支持 `-Proxy`。连接器启动后检查本机状态及自己公开地址下的 `/healthz`。
+
+MCP 入口为 `PUBLIC_ORIGIN` 下的 `/mcp`。在客户端添加该地址，核对回调与申请权限，再使用本机 `Password.cmd` 显示的密码完成网关授权。
 
 ## 日常使用
 
-默认可信管理入口在 `%USERPROFILE%\.agentdock-bridge`，不在容器挂载的工程目录内：
+日常管理使用 `%USERPROFILE%\.agentdock-bridge` 内安装器生成的入口：
 
-- `Start.cmd`：手动启动连接器和监督器。
-- `Status.cmd`：检查本地进程与公网心跳状态。
-- `Stop.cmd`：停止连接器并清理本部署的开发容器。
-- `Password.cmd`：在本机弹窗显示连接密码；不要贴进聊天。
-- `Approve.cmd`：查看并批准精确的待处理请求。
+| 入口 | 用途 |
+| --- | --- |
+| `Start.cmd` | 手动启动连接器和监督器 |
+| `Status.cmd` | 检查本地进程、连接状态及公网探针 |
+| `Stop.cmd` | 停止连接器并清理本安装的开发容器 |
+| `Password.cmd` | 在本机弹窗显示连接密码 |
+| `Approve.cmd` | 查看并批准精确的待处理请求 |
 
-在 MCP 客户端添加网关地址，核对回调与权限，再在自己的网关页面输入本机密码。2026-10-30 的第五轮修复保留连接密码和授权存储代次，不要求因此重新授权。迁移本机状态目录后，未完成的待批准请求需从客户端重新发起。
+读取、列目录、搜索、写入、编辑、删除和执行命令需要本机批准。首次请求返回 `LOCAL_APPROVAL_REQUIRED` 后，运行可信的 `Approve.cmd`，核对完整参数，输入显示的 `APPROVE <编号>`，再让客户端以相同参数重试。批准绑定客户端、权限、全部参数及联网选项，5 分钟内有效、仅使用一次。请求变化后需重新批准，超限请求会明确拒绝。
 
-读取、列目录、搜索、写入、编辑、删除和执行命令首次调用会返回 `LOCAL_APPROVAL_REQUIRED`。在本机运行可信的 `Approve.cmd`，查看完整参数，输入显示的 `APPROVE <编号>`，再让客户端以相同参数重试。批准绑定客户端、权限、全部参数和联网选项，5 分钟有效、仅使用一次。记录使用紧凑 JSON，写入前检查与读取相同的最终字节上限；超限请求会明确拒绝，元数据不会被静默删除或排除在批准摘要之外。空输入取消；请求改变后需重新批准。查看环境、查询已有任务和停止任务不需要批准。
+查看环境、查询已有任务和停止任务免于本机批准，仍检查所需权限；任务控制只允许所属客户端。使用 `command_status` 查询后台任务、`stop_command` 停止任务。连接器重启不会恢复旧任务。
 
-## 开发环境
+无法确认容器清理时，连接器拒绝新命令和文件操作，仍保留所属客户端对已有任务的查询和停止。`cleanup_confirmed: false` 表示清理尚未确认，应在本机检查 Docker。停止请求不会自动重试失败的删除；容器自身时限和可信 `Stop.cmd` 继续提供恢复途径。
 
-先将 `wrangler.jsonc.example` 复制为本机的 `wrangler.jsonc`，填写自己的部署配置；后者不入版本控制。
+## 容器开发环境
 
-按所有者要求，**整个 `D:\Projects` 以读写方式挂载到 `/workspace`**。文件工具接受 `/workspace/...`，也可转换对应 Windows 绝对路径。终端使用 Linux Bash，不能直接执行 Windows `.exe` 或 Windows PowerShell 命令。
+整个允许的工程目录以读写方式挂载到 `/workspace`。文件工具接受 `/workspace/...`，也可转换对应 Windows 绝对路径。命令使用 Linux Bash，不能直接执行 Windows `.exe` 或 Windows PowerShell。
 
 | 类别 | 镜像内的工具 |
 | --- | --- |
 | JavaScript | Node.js 24、npm、pnpm、TypeScript |
 | 通用语言 | Python 3、pip/venv/pipx、Go、Rust/Cargo、Java 21/Maven |
 | 构建工具 | GCC/G++、make、CMake、Ninja、pkg-config、GDB |
-| 平台 CLI | GitHub CLI (`gh`)、Wrangler |
+| 平台 CLI | GitHub CLI（`gh`）、Wrangler |
 | 通用工具 | Git/Git LFS、SSH 客户端、curl/wget、jq、ripgrep、fd-find、rsync、SQLite、压缩工具 |
 
-镜像标签为 `agentdock-dev:2026-10-28`，生产配置固定其 SHA-256，不会跟随标签自动更新。完整包清单位于镜像 `/opt/bridge/os-packages.txt` 和 `/opt/bridge/npm-packages.json`。CLI 已安装，**没有迁移 Windows 登录令牌，也没有把凭证写入镜像**；需要认证的平台操作仍须为容器单独配置适当权限的凭证。
+镜像标签是构建入口，安装后的配置固定具体 SHA-256，不会随标签变化自动更新。完整包清单位于镜像的 `/opt/bridge/os-packages.txt` 和 `/opt/bridge/npm-packages.json`。CLI 已安装，但宿主登录令牌没有迁移或写入镜像；平台操作需要为容器单独配置适当权限的凭证。
 
-文件操作始终无网络。`exec_command` 默认 `network: "none"`；安装依赖或访问平台 API 时，可以显式传 `network: "outbound"` 并在本机批准。联网模式可以访问外部及可达的局域网服务，不是域名白名单。容器不发布入站端口。
+文件操作始终无网络。命令默认 `network: none`，需要联网时显式申请 `network: outbound` 并在本机批准。出站联网可访问外网及可达的局域网服务，不提供域名白名单，也不注入认证凭据。容器不发布入站端口。
 
-每个命令使用独立容器，开发进程以 UID/GID 1000 运行。镜像只读，临时目录和 HOME 使用有上限的 tmpfs。工程构建产物保留在磁盘，临时 HOME 的配置和缓存随容器销毁。每个容器最多 2 CPU、2 GiB 内存、256 个进程；最多并行 4 个命令及 4 个文件操作。同步命令最长 60 秒，后台任务最长 1 小时。使用 `command_status` 查询、`stop_command` 停止自己客户端创建的任务；连接器重启不恢复旧任务。
-
-无法确认容器清理时，连接器拒绝新的命令和文件操作，但仍允许客户端查询和停止自己的已有任务，身份、权限和取消检查继续生效。停止请求不保证 Docker 已恢复；未确认清理的任务会保留 `cleanup_confirmed: false`，须在本机检查 Docker 状态。失败的清理不会自动重试，容器自身时限和可信 `Stop.cmd` 仍是恢复入口。
+每次执行使用独立容器。开发子进程的 UID/GID 为 1000，镜像只读，HOME 和临时目录使用有上限的 tmpfs。工程产物保留在挂载目录，临时 HOME 配置随容器销毁。每个容器最多 2 CPU、2 GiB 内存和 256 个进程；最多并行 4 个命令及 4 个文件操作。同步命令最长 60 秒，后台任务最长 1 小时。
 
 ## 安全边界
 
-- 容器不挂载 Windows 用户目录、网关状态、运行副本、Docker socket 或宿主 CLI 登录配置。控制程序来自只读镜像；宿主连接器从私有状态目录中的安装副本运行。工程源码变更不会自动进入运行副本或镜像。
-- 状态目录检查包括所有者和祖先路径的写入、删除及权限修改风险。状态与运行副本不能放在工程目录或不可信父路径下；更换目录不能只复制启动脚本而跳过检查。
-- 宿主 Node 使用 `%USERPROFILE%\.agentdock-toolchains` 下独立的官方固定版本，校验下载包 SHA-256 与签名；启动时复核程序摘要和路径权限。安装及运行不使用共享 `D:\Toolkit` 中的 Node/npm，也会清除 Node 预加载和 TLS 覆盖环境变量。现有共享工具目录权限不变。
-- 完整工程访问意味着其中的 `.env`、私钥、令牌等也可能被读取和修改。批准操作前要核对实际意图；不可信项目代码和工具输出仍可能携带提示注入。
-- 本地批准降低云端伪造操作的风险，但 Cloudflare/Worker 仍是可信中继，可看到并修改经过它的工具输入输出。这不是端到端加密或端到端客户端签名系统。
-- OAuth 签发、刷新、撤销和认证检查由同一 Durable Object 处理。外部元数据获取在提交锁外进行，版本复核通过后才原子提交并返回结果；持续冲突或超时会安全失败。CIMD 客户端重新授权降权会撤销旧授权。旧刷新凭证重用会撤销整组授权；未批准 `offline_access` 时不颁发刷新凭证。更换所有者密码会使旧客户端和授权失效。撤销不能撤回已经开始的操作。
-- 本地请求账本只保存获准操作的摘要和时间，保留 24 小时、最多 10000 条；无需批准的控制请求使用有上限的短期缓存。重复桥接 ID 不会再次执行。断线或超时的操作可能已有部分效果，不应自动重试写入。
-- 普通控制请求按客户端限额；停止命令有独立的有界缓存和并发槽位，不因普通控制缓存满额而被拦截，且仍核对任务归属。停止操作是幂等的；其专用缓存淘汰旧记录后，旧停止请求可能再次到达归属检查。
-- 待批准请求的精确参数暂存于私有状态目录，过期后不可使用并在后续扫描时清理。连接日志不记录令牌、文件正文或命令输出。Windows DPAPI 与状态目录 ACL 保护本机连接凭证。
-- 文件工具拒绝链接、检查身份、限制遍历预算并使用原子替换。这不是针对任意并发本地写入者的完整文件系统事务；宿主隔离依赖实际容器挂载边界。
-- 字符串参数必须是合法 Unicode；内容、编辑参数、路径及命令中的孤立代理项会在操作前被拒绝，避免静默改变文本或误指向其他路径。
-- 为避免原子替换丢失 Windows 自定义权限，文件工具拒绝替换具有受保护或显式自定义 ACL 的文件。普通继承权限文件仍可编辑。需要保留自定义 ACL 时，请使用可信 Windows 编辑工具；已批准的 Bash 命令仍具有完整工程读写权，可能改变文件权限。
-- 没有新增开机启动、计划任务或云端定时任务。Docker Desktop 必须正常运行；电脑离线、休眠或 Docker 停止时不可执行工具。
+- 完整工程访问包含其中的 `.env`、私钥、令牌等文件。项目代码、文件内容和模型或工具输出都应作为不可信输入处理，可能携带提示注入。
+- 容器不挂载宿主用户目录、网关状态、运行副本、Docker socket 或宿主 CLI 登录配置。宿主连接器运行在受保护安装目录，启动时核对固定 Node 摘要和路径权限，并清除 Node 预加载及 TLS 覆盖变量。
+- Cloudflare/Worker 属于可信中继，可观察和修改经过它的工具输入输出。本机批准绑定精确请求，但不提供端到端加密或客户端签名的执行证明。
+- OAuth 权限与本机批准分别校验。授权事务原子提交，旧刷新凭证重用会撤销整组授权；撤销不能回滚已开始的操作。
+- 文件工具拒绝链接、检查文件身份和 Unicode，限制遍历与输出预算，并使用原子替换。预期内容摘要可防止基于旧内容的修改；这些检查不构成对任意并发本地写入者的完整文件系统事务。
+- 文件工具拒绝替换具有受保护或显式自定义 Windows ACL 的文件，保留其内容和权限。已批准的 Bash 仍有完整工程读写权，可能改变文件及权限。
+- 断线、取消或超时可能已经产生部分效果。请求账本防止相同桥接请求再次执行，不应据此自动重试写入。批准记录由私有目录 ACL 保护，连接凭证另以 Windows DPAPI 加密。
+
+更详细的实现路径见[源码指南](repo-docs/README.md)，修复与历史验收见[安全修复记录](SECURITY-FIXES.md)。
 
 ## 开发和更新
 
-在宿主受信任环境中检查源码后执行：
+在可信开发环境中运行：
 
 ```powershell
 npm.cmd ci
 npm.cmd run check
-docker.exe build -f container/Dockerfile -t agentdock-dev:2026-10-28 .
+npm.cmd test
+```
+
+Docker 集成测试需明确启用并选定已构建的镜像；以下命令串行运行完整测试入口：
+
+```powershell
 $env:AGENTDOCK_DOCKER_TEST='1'
 $env:AGENTDOCK_TEST_IMAGE='agentdock-dev:2026-10-28'
-npm.cmd test
+node --test --test-concurrency=1 test/*.test.mjs cloud/*.test.mjs
 .\node_modules\.bin\wrangler.cmd deploy --dry-run
 ```
 
-停止旧连接器后运行 `scripts\Install-Hardened.ps1 -Workspace D:\Projects`，将已审查源码和生产依赖安装到受保护目录并固定镜像 ID，然后使用可信入口启动。首次安装会下载校验固定版本的 Windows Node；可先单独运行 `scripts\Install-NodeRuntime.ps1`，需要代理时传入 `-Proxy`。不要把工程目录中的任意脚本当作不可篡改的控制入口。
+更新宿主连接器时，先用可信入口停止旧安装，审阅源码后重新运行 `Install-Hardened.ps1`，再从新生成的可信入口启动。容器代码或工具变更还需重建、测试镜像并重新固定镜像 ID；检出源码不会自动替换运行副本。云端更新使用本机部署配置单独部署。
 
-旧版本默认状态目录为 `%LOCALAPPDATA%\AgentDockBridge`。升级到新的用户目录位置时，应在旧连接器停止后迁移受保护凭证和配置、安装新运行副本，再使用新目录入口；保留原连接凭证，待批准请求重新发起。实际迁移、安装和部署是否完成，以本次运维验收记录为准。
+旧版 `%LOCALAPPDATA%\AgentDockBridge` 的迁移应在旧连接器停止后处理受保护凭证、配置及新运行副本，不能只复制启动器；迁移后的待批准请求需重新发起。仓库没有通用的自动迁移入口。轮换凭证使用已审阅的 `scripts/Rotate-Secrets.ps1`，运行前停止连接器，并使用带 Wrangler 开发依赖和正确部署配置的检出目录；轮换后客户端需重新授权。
 
-云端部署固定使用 `wrangler.jsonc` 指定的账户、Worker 和域名。`scripts\Rotate-Secrets.ps1` 通过内存管道上传本项目新秘密，保留加密恢复副本，不输出明文。`scripts\acceptance-v2.mjs` 仅为自己的临时 canary 操作批准一次请求，结束后撤销测试授权。
+提交标题、正文和签名遵循[贡献指南](CONTRIBUTING.md)。真实配置、凭证、构建输出和本机审查证据留在版本控制之外。
 
-`SECURITY-REVIEW.md` 是升级前历史审查，`audit/` 是历史漏洞复现，不能作为修复后的通过标准。当前测试在 `test/` 和 `cloud/*.test.mjs`；修复状态及实际验收证据见 `SECURITY-FIXES.md` 和 `artifacts/`。
+## 文档与验证
 
-<!-- repo-docs routing -->
+[中文源码指南](repo-docs/README.md)采用 Lite 指南加代码地图，聚焦一次敏感工具请求的批准和执行流程。当前实现、测试、生产运行副本和云端部署应分别核验；文档校验或构建不代表业务与生产验收通过。已执行验证的日期、对应源码及范围见[修复和验收记录](SECURITY-FIXES.md)。
 
-## 源码指南与文档站
+文档站使用 VitePress 默认主题，内容只维护在 `repo-docs/`，站点通过 include 读取：
 
-云端认证网关把工具请求交给 Windows 受保护连接器，再由本机对精确参数批准，交给 Linux 容器访问工程文件或运行 Bash。批准边界和执行结果需要分别理解。当前没有独立 LICENSE 文件，项目整体分发许可尚未确认，不能以依赖许可代替。
-
-从[阅读路径](repo-docs/README.md)进入[一条真实主流程](repo-docs/walkthroughs/one-real-run.md)，再用[代码地图](repo-docs/code-map.md)定位改动。证据与未覆盖边界见[源码调查记录](repo-docs/references/source-evidence.md)。
-
-## 文档站
-
-文档站采用 VitePress 默认主题，依赖与业务项目分开安装。默认输出 `docs-site/.vitepress/dist/`；独立核验可在构建命令后加 `-- --outDir <仓库外绝对目录>`。指南正文只维护 `repo-docs/`，站点通过 include 读取；网页中的仓库源码链接显示为精确文件路径，不复制源码或本机资源。
-
-```sh
-npm --prefix docs-site ci
-npm --prefix docs-site run docs:dev -- --host 127.0.0.1
-npm --prefix docs-site run docs:build
+```powershell
+npm.cmd --prefix docs-site ci
+npm.cmd --prefix docs-site run docs:dev -- --host 127.0.0.1
+npm.cmd --prefix docs-site run docs:build
 ```
+
+默认输出为 `docs-site/.vitepress/dist/`，构建命令可追加 `-- --outDir <仓库外绝对目录>`。独立文档站把仓库源码链接显示为精确路径，不随页面发布源码或本机资源。
+
+## 许可
+
+本项目以 [GNU General Public License 第 3 版](LICENSE)开源，标识为 `GPL-3.0-only`。依赖组件保留各自的许可证。
