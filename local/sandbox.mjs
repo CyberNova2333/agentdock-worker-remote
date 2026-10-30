@@ -140,7 +140,17 @@ export async function createSandboxRuntime(config) {
   }
   const snapshot = j => ({ command_id: j.id, running: j.finished ? (j.cleanupConfirmed ? false : null) : true, cleanup_confirmed: j.cleanupConfirmed, cancelled: j.cancelled, exit_code: j.code, signal: j.signal, stdout: j.stdout.toString('utf8'), stderr: j.stderr.toString('utf8'), truncated: j.truncated, timed_out: j.timedOut, started_at: j.startedAt, finished_at: j.finishedAt });
   async function call(name, args, options) {
-    if (closed || options?.signal?.aborted) throw new Error('Operation cancelled.');
+    if (options?.signal?.aborted) throw new Error('Operation cancelled.');
+    // Cleanup uncertainty blocks new work, but owners must still be able to
+    // inspect and stop their existing jobs while the connector is closed.
+    if (['command_status', 'get_command', 'stop_command'].includes(name)) {
+      if (!UUID.test(args.command_id || '')) throw new Error('Invalid command ID.');
+      const job = jobs.get(args.command_id);
+      if (!job || job.ownerClient !== (options?.authorization?.clientId ?? null)) throw new Error('Command not found for this client in this connector session.');
+      if (name === 'stop_command') { await stop(job); await job.done; }
+      return result(snapshot(job));
+    }
+    if (closed) throw new Error('Operation cancelled.');
     if (name === 'computer_context') return result({ name: 'CyberNova isolated development workspace', version: '2.0.0', platform: 'linux', shell: 'bash', roots: ['/workspace'], host_mount: root, default_cwd: '/workspace', command_execution: config.allowExec === true, image, security: 'Disposable containers. Read-only image. Development child uid 1000, no host home, credentials, Docker socket or published ports. Full project access is intentional; project-local secrets are readable. Outbound networking requires local approval.', limits: { concurrent_commands: 4, concurrent_file_requests: 4, memory: '2 GiB', cpus: 2, pids: 256 } });
     if (name === 'exec_command') {
       if (config.allowExec !== true) throw new Error('Command execution is disabled.');
@@ -166,13 +176,6 @@ export async function createSandboxRuntime(config) {
       // Background jobs get their own bounded lifetime; the RPC returning is not cancellation.
       if (mode === 'background') options?.signal?.removeEventListener('abort', abort);
       else options?.signal?.removeEventListener('abort', abort);
-      return result(snapshot(job));
-    }
-    if (['command_status', 'get_command', 'stop_command'].includes(name)) {
-      if (!UUID.test(args.command_id || '')) throw new Error('Invalid command ID.');
-      const job = jobs.get(args.command_id);
-      if (!job || job.ownerClient !== (options?.authorization?.clientId ?? null)) throw new Error('Command not found for this client in this connector session.');
-      if (name === 'stop_command') { await stop(job); await job.done; }
       return result(snapshot(job));
     }
     if (!SANDBOX_TOOLS.some(t => t.name === name)) throw new Error('Unknown tool.');

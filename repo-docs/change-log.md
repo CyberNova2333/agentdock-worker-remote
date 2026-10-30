@@ -1,5 +1,15 @@
 # 指南变更记录
 
+## 2026-10-30 23:27 +08:00：保留清理故障后的任务控制
+
+- 触发：最终审查发现清理故障同时封锁已有任务查询和停止；同步决策为 `foreground patch`。
+- 中英 README 和主流程说明故障时只拒绝新命令、文件操作，保留所属客户端对已有任务的查询与停止；取消和权限校验继续生效。
+- 证据表记录控制分支与关闭检查的顺序。未确认清理仍按失败报告，不自动重试；容器时限和可信本机停止入口继续有效。
+- 本条基于下列提交及本次修复工作树的源码核对；实际业务测试、运行副本更新与部署结果另见根目录 `SECURITY-FIXES.md`。
+- 验证：`validate_repo_docs.py --lite` 退出 0，0 errors、0 warnings；日志在 `artifacts/fix-final-01/repo-docs-validation.txt`。
+
+Synced through 5ded65ef08bb6e15b81ce1e22b7fe66dda567abb
+
 ## 2026-10-30：同步第五轮修复的使用入口与批准预算
 
 - 触发：安全与批准流程修复；同步决策为 `foreground patch`，保留 Lite 指南范围。

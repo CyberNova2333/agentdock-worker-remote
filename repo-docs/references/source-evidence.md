@@ -23,6 +23,7 @@
 | 批准记录按最终字节统一读写预算，超限先拒绝 | [记录存储](../../local/approval-store.mjs) 搜索 `MAX_RECORD_BYTES`、`atomicJson`；[预算回归](../../test/approval-budget.test.mjs) | 已确认 | 2026-10-30 核对源码和测试断言；部署结果另行验收 | 主流程 Step 2–3 |
 | 默认状态目录在用户目录下，祖先路径也需可信 | [连接器](../../local/connector.mjs) 搜索 `defaultStateDirectory`；[状态检查](../../scripts/State-Safety.ps1) 搜索 `Assert-PrivateState` | 已确认 | 迁移旧状态属于运维任务，源码变更不自动迁移 | 根 README、指南运行入口 |
 | Docker 初始化只读查询可在超时后重试一次 | [查询策略](../../local/docker-query.mjs) 搜索 `queryDockerState` | 已确认 | 不用于创建、启动、删除容器或文件副作用 | 代码地图 |
+| 容器清理不确定时拒绝新执行，但保留自有任务查询与停止 | [沙箱接线](../../local/sandbox.mjs) 搜索 `call`、`closed`、`ownerClient`、`cleanupConfirmed` | 已确认 | 2026-10-30 核对控制分支先于关闭检查；仍检查取消和任务归属，清理失败不自动重试；测试与运行副本验收另见根修复记录 | 主流程 Step 4、根 README |
 | 桥接 ID 账本先登记再执行 | [连接器](../../local/connector.mjs) 搜索 `receipts.claim`、`handleRpc` | 已确认 | 不重放输出；超时可能已有部分效果 | 主流程 Step 3 |
 | 变参数与跨重启去重有测试断言 | [连接器回归](../../test/connector.test.mjs) | 已确认 | 使用假的运行器；本轮未跑 | 主流程 Step 5 |
 
