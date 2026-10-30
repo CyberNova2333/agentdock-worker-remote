@@ -8,6 +8,10 @@
 - 定向核对当前管理脚本、批准存储、连接器和 Docker 查询源码；不把文档更新当作迁移或生产验收。实际测试与部署结果见根目录 `SECURITY-FIXES.md`。
 - 验证：`validate_repo_docs.py --lite` 退出 0，0 errors、1 warning；日志在 `artifacts/fix-round5/repo-docs-validation.txt`。唯一提示为缺少同步 SHA：同步时仓库尚无首个提交、HEAD 不存在，不伪造同步值。
 
+首次签名提交建立后补齐同步锚点；后续变更仅整理换行和本条记录，不改变运行行为。
+
+Synced through 9b483eebeeadd90b98bc01c8a71a3daf4bdbd93b
+
 ## 2026-10-29：建立主流程指南并对齐文档入口
 
 - 触发：用户授权 widened docs sync；同步决策为 `foreground patch`，在共享工作树完成指定文档层。
