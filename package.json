@@ -1,0 +1,31 @@
+{
+  "name": "agentdock-bridge",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Personal authenticated MCP connection from ChatGPT to a Windows workspace",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs cloud/*.test.mjs",
+    "check": "node --check cloud/index.mjs && node --check cloud/auth-store.mjs && node --check local/connector.mjs && node --check local/sandbox.mjs && node --check local/tools.mjs && node --check container/runner.mjs",
+    "dev": "wrangler dev --ip 127.0.0.1 --port 8797",
+    "deploy": "wrangler deploy",
+    "start": "node local/connector.mjs"
+  },
+  "dependencies": {
+    "@cloudflare/workers-oauth-provider": "1.2.4",
+    "https-proxy-agent": "9.1.0",
+    "ws": "8.22.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2",
+    "miniflare": "5.20261023.1-beta",
+    "wrangler": "4.154.0"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true,
+    "workerd@1.20261023.1": true
+  }
+}

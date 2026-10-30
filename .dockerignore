@@ -1,0 +1,8 @@
+**
+!container/
+!container/Dockerfile
+!container/runner.mjs
+!container/file-worker.mjs
+!local/
+!local/tools.mjs
+!local/file-safety.mjs

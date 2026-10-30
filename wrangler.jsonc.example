@@ -1,0 +1,44 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "agentdock-bridge",
+  "main": "cloud/index.mjs",
+  "compatibility_date": "2026-10-28",
+  "compatibility_flags": [
+    "nodejs_compat",
+    "global_fetch_strictly_public"
+  ],
+  "workers_dev": true,
+  "preview_urls": false,
+  "vars": {
+    "PUBLIC_ORIGIN": "https://bridge.example.test"
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "RELAY",
+        "class_name": "BridgeRelay"
+      },
+      {
+        "name": "AUTH",
+        "class_name": "AuthCoordinator"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": [
+        "BridgeRelay"
+      ]
+    },
+    {
+      "tag": "v2",
+      "new_sqlite_classes": [
+        "AuthCoordinator"
+      ]
+    }
+  ],
+  "observability": {
+    "enabled": false
+  }
+}
