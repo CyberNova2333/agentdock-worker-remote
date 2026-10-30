@@ -1,3 +1,6 @@
+# Keep repository text portable; checked-out Windows launchers use CRLF.
+* text=auto eol=lf
+*.cmd text eol=crlf
 
 
 # Portable repository maintenance hooks

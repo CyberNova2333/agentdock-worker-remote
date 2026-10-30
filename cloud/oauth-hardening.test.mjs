@@ -153,4 +153,3 @@ test('a slow authorization form cannot hold the shared authorization transaction
     assert.equal(access.status, 503, 'The token was authenticated while the form body was still incomplete');
   } finally { clearTimeout(timer); stream.close(); await slow; }
 });
-
