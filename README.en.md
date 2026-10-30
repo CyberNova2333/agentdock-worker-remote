@@ -14,6 +14,8 @@ Files use `/workspace/...`; commands run Linux Bash. File tools have no network;
 
 The installed connector and pinned image are separate from the checkout. Do not treat checkout launchers as immutable trusted control programs. Docker must be available; background tasks do not survive connector restarts. A timeout can leave partial effects and must not cause automatic write retries.
 
+If container cleanup cannot be confirmed, the connector rejects new commands and file operations while still allowing clients to inspect and stop their own existing tasks. Identity, permission and cancellation checks remain in effect. A stop request does not establish Docker recovery: tasks whose removal is unconfirmed retain `cleanup_confirmed: false` and require a local Docker check. Failed cleanup is not retried automatically; container time limits and the trusted `Stop.cmd` remain recovery paths.
+
 ## Development checks
 
 Copy `wrangler.jsonc.example` to local `wrangler.jsonc` and configure your deployment. The local file is excluded from version control.

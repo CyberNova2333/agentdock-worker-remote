@@ -1,6 +1,16 @@
 # 安全修复与部署记录
 
-本次升级将生产执行路径切换为 Docker，并按所有者要求完整读写 `D:\Projects`。当前验收结果以 `artifacts/hardening-deployment.json`、`artifacts/hardening-tests.txt`、`artifacts/acceptance-v2-result.json` 为准。
+本次升级将生产执行路径切换为 Docker，并按所有者要求完整读写 `D:\Projects`。最新控制通道修复的验收结果见 `artifacts/fix-final-01/`；此前完整升级结果保留在 `artifacts/hardening-deployment.json`、`artifacts/hardening-tests.txt`。
+
+## 最终审查问题修复（2026-10-30）
+
+修复 `FINAL-01`：一个容器清理失败后，全局关闭标志会连带拒绝其他运行中任务的查询和停止。现在先处理已有任务的控制请求，再拒绝新命令和文件操作；取消、参数、权限和客户端归属检查继续生效。清理失败仍报告 `cleanup_confirmed: false`，没有增加删除或执行的自动重试。
+
+新增合成 Docker 故障回归，直接测试沙箱源码：旧版本在所属客户端查询处失败，修复后通过；覆盖跨客户端拒绝、取消、禁止新执行、停止已有任务和不重复删除。最终固定镜像串行回归 **101 项通过，0 失败、0 跳过**；首次整套运行曾遇到一次 Windows PowerShell 扫描组件原生崩溃，保留失败日志，受影响的 4 项测试及随后整套回归均通过，未修改系统扫描设置。
+
+本机受保护运行副本已更新，完整安装清单的 **28 个文件**与源码、摘要逐项一致，固定 Node 和私有路径权限检查通过。停止返回 503、重启恢复 200，公网 **9 项验收通过**。Worker、固定开发镜像、连接密码和 OAuth 授权代次沿用此前配置。文档校验 0 错误、0 警告，VitePress 构建通过。
+
+证据：`artifacts/fix-final-01/full-tests.txt`、`runtime-update.json`、`public-acceptance.json`；新回归的修复前后对照见 `artifacts/final-fix-regression/`。本机证据与真实配置均不随代码发布。
 
 ## 第五轮修复（2026-10-30）
 
