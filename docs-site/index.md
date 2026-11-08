@@ -35,6 +35,21 @@ features:
 2. **本地裁决**：由 Windows 保护层拦截参数，向维护者展示清晰的人类可读审批；
 3. **安全执行**：经批准后在受限容器内执行，并将结果结构化回传。
 
+
+## 架构全景
+
+<div class="archify-diagram-card" style="margin: 1.5rem 0; border: 1px solid var(--vp-c-border); border-radius: 12px; overflow: hidden; background: var(--vp-c-bg-soft); box-shadow: 0 4px 16px rgba(0,0,0,0.06);">
+  <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 18px; background: var(--vp-c-bg-elv); border-bottom: 1px solid var(--vp-c-border); font-size: 13px;">
+    <span style="font-weight: 600; color: var(--vp-c-text-1); display: flex; align-items: center; gap: 8px;">
+      <span style="font-size: 16px;">📐</span> 远程受控调度架构（交互式架构图表，支持平移 / 缩放 / 探查）
+    </span>
+    <a href="/diagrams/worker-architecture.html" target="_blank" rel="noreferrer" style="font-size: 12px; color: var(--vp-c-brand-1); text-decoration: none; font-weight: 500;">
+      在新窗口全屏打开 ↗
+    </a>
+  </div>
+  <iframe src="/diagrams/worker-architecture.html" width="100%" height="520px" frameborder="0" style="display: block; border: none;" allowfullscreen loading="lazy"></iframe>
+</div>
+
 ## 怎么用 / 快速上手
 
 ### 1. 安装与初始化
@@ -43,10 +58,10 @@ Node.js 24+ 环境下安装依赖：
 
 ```bash
 # 安装依赖
-npm ci
+pnpm install --frozen-lockfile
 
 # 启动本地安全连接器测试
-npm test
+pnpm test
 ```
 
 ### 2. 桥接服务连接配置

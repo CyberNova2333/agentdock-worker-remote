@@ -6,6 +6,9 @@ AgentDock Bridge 是自行管理 Windows 工程环境的个人 MCP 网关。MCP 
 
 适用于需要远程使用本机开发环境、同时保留本机精确批准的人。电脑、连接器与 Docker 必须在线，工具执行依赖这台 Windows 主机。
 
+
+> 📐 **交互式架构图表**：支持动态探查、缩放平移与主题切换的高保真架构图：[远程受控调度架构图](https://cybernova2333.github.io/agentdock-worker-remote/diagrams/worker-architecture.html)。
+
 ## 阅读路径
 
 | 读者目标 | 从这里开始 | 读完后获得什么 |
