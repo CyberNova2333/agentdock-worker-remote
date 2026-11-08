@@ -29,15 +29,267 @@ async function rate(request, env, category, maximum, seconds) {
 
 function documentPage(title, content) {
   return `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(title)} · AgentDock Bridge</title><style>
-:root{color-scheme:dark;font:16px/1.6 "IBM Plex Sans","Microsoft YaHei",sans-serif;background:#09090b;color:#fafafa;--surface:color-mix(in srgb,#fafafa 8%,#09090b);--layer:color-mix(in srgb,#fafafa 4%,#09090b);--muted:color-mix(in srgb,#fafafa 72%,#09090b);--line:color-mix(in srgb,#fafafa 24%,#09090b)}*{box-sizing:border-box}body{margin:0;padding:48px 24px;min-height:100svh;display:grid;place-items:center}main{width:min(100%,704px);padding:40px;border-radius:8px;background:var(--surface)}.brand{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}h1{font-size:32px;line-height:1.25;letter-spacing:-.025em;margin:16px 0 24px}h2{font-size:20px;line-height:1.4;margin:0 0 16px}p{margin:16px 0;color:var(--muted)}strong{color:#fafafa;overflow-wrap:anywhere}ul{padding-left:24px;color:var(--muted)}li+li{margin-top:8px}.notice{padding:16px;background:var(--layer);border-radius:4px;font-size:14px}.error{background:color-mix(in srgb,#ef4444 12%,#09090b);color:#ef4444}label{display:block;margin:24px 0 8px;font-size:14px;font-weight:600}input[type=password]{display:block;width:100%;border:1px solid var(--line);border-radius:4px;background:#09090b;color:#fafafa;padding:12px;font:inherit}input:focus-visible,button:focus-visible{outline:2px solid #0c5cab;outline-offset:3px}.actions{display:flex;gap:8px;margin-top:24px}button{flex:1;border:0;border-radius:4px;background:#0c5cab;color:#fafafa;padding:12px 16px;cursor:pointer;font:600 16px "IBM Plex Sans","Microsoft YaHei",sans-serif}button:hover{background:#0a4a8a}.secondary{background:var(--layer);color:#fafafa}.secondary:hover{background:#09090b}.foot{font-size:12px;color:var(--muted);margin-top:24px}code{font:14px "IBM Plex Sans",Consolas,monospace;overflow-wrap:anywhere}.permissions{background:var(--layer);padding:24px;margin:24px 0;border-radius:8px}@media(max-width:480px){main{padding:24px}body{padding:24px 12px}.actions{flex-direction:column}}
+:root {
+  color-scheme: dark light;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --canvas-default: #0d1117;
+  --canvas-subtle: #161b22;
+  --canvas-inset: #010409;
+  --canvas-muted: #21262d;
+  --fg-default: #f0f6fc;
+  --fg-muted: #8b949e;
+  --fg-subtle: #6e7681;
+  --fg-on-emphasis: #ffffff;
+  --border-default: #30363d;
+  --border-muted: #21262d;
+  --accent-fg: #2f81f7;
+  --accent-emphasis: #1f6feb;
+  --accent-hover: #388bfd;
+  --accent-subtle: rgba(56, 139, 253, 0.15);
+  --accent-muted: rgba(56, 139, 253, 0.4);
+  --danger-fg: #f85149;
+  --danger-subtle: rgba(248, 81, 73, 0.15);
+  --danger-muted: rgba(248, 81, 73, 0.4);
+  --btn-shadow: 0 0 transparent;
+  font: 14px/1.5 var(--font-sans);
+  background: var(--canvas-inset);
+  color: var(--fg-default);
+}
+@media (prefers-color-scheme: light) {
+  :root {
+    --canvas-default: #ffffff;
+    --canvas-subtle: #f6f8fa;
+    --canvas-inset: #f6f8fa;
+    --canvas-muted: #eaeef2;
+    --fg-default: #1f2328;
+    --fg-muted: #57606a;
+    --fg-subtle: #6e7781;
+    --border-default: #d0d7de;
+    --border-muted: #d8dee4;
+    --accent-fg: #0969da;
+    --accent-emphasis: #0969da;
+    --accent-hover: #0860ca;
+    --accent-subtle: #ddf4ff;
+    --accent-muted: rgba(84, 174, 255, 0.4);
+    --danger-fg: #cf222e;
+    --danger-subtle: #ffebe9;
+    --danger-muted: rgba(255, 129, 130, 0.4);
+    --btn-shadow: 0 1px 0 rgba(31, 35, 40, 0.04);
+  }
+}
+:root:has(.dn-input:checked) {
+  --canvas-default: #ffffff;
+  --canvas-subtle: #f6f8fa;
+  --canvas-inset: #f6f8fa;
+  --canvas-muted: #eaeef2;
+  --fg-default: #1f2328;
+  --fg-muted: #57606a;
+  --fg-subtle: #6e7781;
+  --border-default: #d0d7de;
+  --border-muted: #d8dee4;
+  --accent-fg: #0969da;
+  --accent-emphasis: #0969da;
+  --accent-hover: #0860ca;
+  --accent-subtle: #ddf4ff;
+  --accent-muted: rgba(84, 174, 255, 0.4);
+  --danger-fg: #cf222e;
+  --danger-subtle: #ffebe9;
+  --danger-muted: rgba(255, 129, 130, 0.4);
+  --btn-shadow: 0 1px 0 rgba(31, 35, 40, 0.04);
+}
+@media (prefers-color-scheme: light) {
+  :root:has(.dn-input:checked) {
+    --canvas-default: #0d1117;
+    --canvas-subtle: #161b22;
+    --canvas-inset: #010409;
+    --canvas-muted: #21262d;
+    --fg-default: #f0f6fc;
+    --fg-muted: #8b949e;
+    --fg-subtle: #6e7681;
+    --border-default: #30363d;
+    --border-muted: #21262d;
+    --accent-fg: #2f81f7;
+    --accent-emphasis: #1f6feb;
+    --accent-hover: #388bfd;
+    --accent-subtle: rgba(56, 139, 253, 0.15);
+    --accent-muted: rgba(56, 139, 253, 0.4);
+    --danger-fg: #f85149;
+    --danger-subtle: rgba(248, 81, 73, 0.15);
+    --danger-muted: rgba(248, 81, 73, 0.4);
+    --btn-shadow: 0 0 transparent;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; padding: 40px 16px; min-height: 100svh; display: grid; place-items: center; background: var(--canvas-inset); color: var(--fg-default); }
+main { width: min(100%, 640px); padding: 24px; border-radius: 8px; background: var(--canvas-default); border: 1px solid var(--border-default); box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12); overflow: hidden; }
+.brand { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: -24px -24px 20px; padding: 10px 20px; background: var(--canvas-subtle); border-bottom: 1px solid var(--border-default); font-size: 13px; font-weight: 600; color: var(--fg-muted); }
+.brand-title { display: inline-flex; align-items: center; gap: 8px; }
+.brand-title::before { content: ""; width: 8px; height: 8px; border-radius: 9999px; background: var(--accent-fg); box-shadow: 0 0 0 3px var(--accent-subtle); }
 
-  </style></head><body><main><div class="brand">CyberNova · Personal computer gateway</div>${content}</main></body></html>`;
+/* Animated Pure-CSS DayNightSwitch */
+.dn-host { display: inline-flex; align-items: center; cursor: pointer; position: relative; user-select: none; }
+.dn-input { position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none; }
+.dn-host .components {
+  position: relative;
+  width: 140px;
+  height: 50px;
+  background-color: rgba(70, 133, 192, 1);
+  border-radius: 50px;
+  box-shadow: inset 0 0 5px 3px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  transform: scale(0.42);
+  transform-origin: right center;
+  transition: 0.6s ease;
+}
+.dn-host .main-button {
+  margin: 6.5px 0 0 7.5px;
+  width: 37px;
+  height: 37px;
+  background-color: rgba(255, 195, 35, 1);
+  border-radius: 50%;
+  box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.4), inset -3px -5px 3px -3px rgba(0, 0, 0, 0.45), inset 4px 5px 2px -2px rgba(255, 230, 80, 1);
+  transition: 0.6s ease;
+  position: relative;
+}
+.dn-host .moon {
+  position: absolute;
+  background-color: rgba(150, 160, 180, 1);
+  box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.3);
+  border-radius: 50%;
+  transition: 0.5s ease;
+  opacity: 0;
+}
+.dn-host .moon:nth-child(1) { top: 6.5px; left: 20px; width: 10.5px; height: 10.5px; }
+.dn-host .moon:nth-child(2) { top: 17.5px; left: 8px; width: 8px; height: 8px; }
+.dn-host .moon:nth-child(3) { top: 22px; left: 18px; width: 11px; height: 11px; }
+.dn-host .daytime-background {
+  position: absolute;
+  border-radius: 50%;
+  transition: 0.6s ease;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+.dn-host .dn-bg-1 { top: -25px; left: -18px; width: 100px; height: 100px; }
+.dn-host .dn-bg-2 { top: -45px; left: -38px; width: 140px; height: 140px; }
+.dn-host .dn-bg-3 { top: -65px; left: -58px; width: 180px; height: 180px; }
+.dn-host .cloud { position: absolute; border-radius: 50%; background-color: rgba(255, 255, 255, 1); transition: 0.6s ease; }
+.dn-host .dn-cloud-1 { bottom: -20px; right: -8px; width: 45px; height: 45px; }
+.dn-host .dn-cloud-2 { bottom: -12px; right: 18px; width: 32px; height: 32px; }
+.dn-host .dn-cloud-3 { bottom: -22px; right: 38px; width: 42px; height: 42px; }
+.dn-host .dn-cloud-4 { bottom: -25px; right: 60px; width: 40px; height: 40px; }
+.dn-host .stars { position: absolute; opacity: 0; transition: 0.6s ease; }
+.dn-host .dn-star-1 { top: 8px; left: 32px; }
+.dn-host .dn-star-2 { top: 24px; left: 62px; }
+.dn-host .dn-star-3 { top: 12px; left: 88px; }
+.dn-host .dn-star-4 { top: 28px; left: 110px; }
+.dn-host .star-son { width: 3px; height: 3px; background: #fff; border-radius: 50%; box-shadow: 0 0 3px #fff; }
+
+/* Dark mode state for DayNightSwitch */
+:root .dn-host .components { background-color: rgba(25, 30, 50, 1); }
+:root .dn-host .main-button { transform: translateX(88px); background-color: rgba(195, 200, 215, 1); box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.4), inset -3px -5px 3px -3px rgba(0, 0, 0, 0.45), inset 4px 5px 2px -2px rgba(255, 255, 255, 1); }
+:root .dn-host .moon { opacity: 1; }
+:root .dn-host .cloud { transform: translateY(60px); opacity: 0; }
+:root .dn-host .stars { opacity: 1; }
+:root .dn-host .daytime-background { opacity: 0.05; }
+
+@media (prefers-color-scheme: light) {
+  :root .dn-host .components { background-color: rgba(70, 133, 192, 1); }
+  :root .dn-host .main-button { transform: none; background-color: rgba(255, 195, 35, 1); box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.4), inset -3px -5px 3px -3px rgba(0, 0, 0, 0.45), inset 4px 5px 2px -2px rgba(255, 230, 80, 1); }
+  :root .dn-host .moon { opacity: 0; }
+  :root .dn-host .cloud { transform: none; opacity: 1; }
+  :root .dn-host .stars { opacity: 0; }
+  :root .dn-host .daytime-background { opacity: 1; }
+}
+
+:root:has(.dn-input:checked) .dn-host .components { background-color: rgba(70, 133, 192, 1); }
+:root:has(.dn-input:checked) .dn-host .main-button { transform: none; background-color: rgba(255, 195, 35, 1); box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.4), inset -3px -5px 3px -3px rgba(0, 0, 0, 0.45), inset 4px 5px 2px -2px rgba(255, 230, 80, 1); }
+:root:has(.dn-input:checked) .dn-host .moon { opacity: 0; }
+:root:has(.dn-input:checked) .dn-host .cloud { transform: none; opacity: 1; }
+:root:has(.dn-input:checked) .dn-host .stars { opacity: 0; }
+:root:has(.dn-input:checked) .dn-host .daytime-background { opacity: 1; }
+
+@media (prefers-color-scheme: light) {
+  :root:has(.dn-input:checked) .dn-host .components { background-color: rgba(25, 30, 50, 1); }
+  :root:has(.dn-input:checked) .dn-host .main-button { transform: translateX(88px); background-color: rgba(195, 200, 215, 1); box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.4), inset -3px -5px 3px -3px rgba(0, 0, 0, 0.45), inset 4px 5px 2px -2px rgba(255, 255, 255, 1); }
+  :root:has(.dn-input:checked) .dn-host .moon { opacity: 1; }
+  :root:has(.dn-input:checked) .dn-host .cloud { transform: translateY(60px); opacity: 0; }
+  :root:has(.dn-input:checked) .dn-host .stars { opacity: 1; }
+  :root:has(.dn-input:checked) .dn-host .daytime-background { opacity: 0.05; }
+}
+
+h1 { font-size: 20px; font-weight: 600; line-height: 1.25; margin: 0 0 12px; color: var(--fg-default); }
+h2 { font-size: 14px; font-weight: 600; line-height: 1.4; margin: 0 0 12px; color: var(--fg-default); }
+p { margin: 12px 0; color: var(--fg-muted); font-size: 14px; }
+strong { color: var(--fg-default); font-weight: 600; overflow-wrap: anywhere; }
+ul { list-style: none; padding: 0; margin: 0; color: var(--fg-muted); }
+li { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px; padding: 8px 0; border-top: 1px solid var(--border-muted); font-size: 13px; }
+li:first-child { border-top: 0; padding-top: 0; }
+li:last-child { padding-bottom: 0; }
+.scope-tag { display: inline-flex; align-items: center; font: 600 12px/18px var(--font-mono); color: var(--accent-fg); background: var(--accent-subtle); border: 1px solid var(--accent-muted); border-radius: 9999px; padding: 1px 8px; }
+.notice { padding: 12px 16px; background: var(--accent-subtle); border: 1px solid var(--accent-muted); border-radius: 6px; font-size: 13px; color: var(--fg-default); margin: 16px 0; }
+.error { background: var(--danger-subtle); border-color: var(--danger-muted); color: var(--danger-fg); }
+label { display: block; margin: 16px 0 6px; font-size: 14px; font-weight: 600; color: var(--fg-default); }
+input[type=password] { display: block; width: 100%; min-height: 34px; border: 1px solid var(--border-default); border-radius: 6px; background: var(--canvas-inset); color: var(--fg-default); padding: 5px 12px; font: 14px/20px var(--font-sans); transition: border-color 120ms ease, box-shadow 120ms ease; }
+input[type=password]:focus-visible { outline: none; border-color: var(--accent-fg); box-shadow: 0 0 0 3px var(--accent-subtle); }
+button:focus-visible { outline: 2px solid var(--accent-fg); outline-offset: 2px; }
+
+/* Tactile Primer v2 Buttons */
+.actions { display: flex; gap: 10px; margin-top: 18px; }
+button {
+  flex: 1;
+  min-height: 34px;
+  border-radius: 6px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent-emphasis) 88%, #ffffff 12%) 0%, var(--accent-emphasis) 100%);
+  border: 1px solid color-mix(in srgb, var(--accent-emphasis) 80%, #000 20%);
+  color: var(--fg-on-emphasis);
+  padding: 6px 16px;
+  cursor: pointer;
+  font: 600 14px/20px var(--font-sans);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 1px 3px rgba(9, 105, 218, 0.24);
+  transition: background-color 120ms ease, border-color 120ms ease, transform 80ms ease, box-shadow 80ms ease;
+}
+button:hover {
+  background: linear-gradient(180deg, var(--accent-emphasis) 0%, var(--accent-hover) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 3px 8px rgba(9, 105, 218, 0.32);
+  transform: translateY(-0.5px);
+}
+button:active {
+  transform: translateY(0.5px) scale(0.99);
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.28);
+}
+.secondary {
+  background: linear-gradient(180deg, var(--canvas-default) 0%, var(--canvas-subtle) 100%);
+  border: 1px solid var(--border-default);
+  color: var(--fg-default);
+  font-weight: 500;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 1px 2px rgba(31, 35, 40, 0.05);
+}
+.secondary:hover {
+  background: linear-gradient(180deg, var(--canvas-subtle) 0%, color-mix(in srgb, var(--canvas-subtle) 85%, var(--fg-muted) 15%) 100%);
+  border-color: color-mix(in srgb, var(--border-default) 60%, var(--fg-muted));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 2px 5px rgba(31, 35, 40, 0.1);
+  transform: translateY(-0.5px);
+}
+.secondary:active {
+  transform: translateY(0.5px) scale(0.99);
+  box-shadow: inset 0 2px 4px rgba(31, 35, 40, 0.16);
+}
+
+.endpoint-box { background: var(--canvas-subtle); border: 1px solid var(--border-default); border-radius: 6px; padding: 14px 16px; margin: 16px 0; }
+.endpoint-box label { margin: 0 0 6px 0; font-size: 12px; font-weight: 600; color: var(--fg-muted); }
+.endpoint-box .sub { margin: 6px 0 0 0; font-size: 12px; color: var(--fg-muted); }
+.foot { font-size: 12px; color: var(--fg-muted); margin: 20px -24px -24px; border-top: 1px solid var(--border-default); background: var(--canvas-subtle); padding: 12px 24px; }
+code { font: 12px/1.5 var(--font-mono); color: var(--fg-default); background: var(--canvas-subtle); border: 1px solid var(--border-default); border-radius: 6px; padding: 2px 6px; overflow-wrap: anywhere; }
+.permissions { background: var(--canvas-subtle); border: 1px solid var(--border-default); padding: 16px; margin: 16px 0; border-radius: 6px; }
+@media (max-width: 480px) { main { padding: 16px; } .brand { margin: -16px -16px 16px; padding: 10px 16px; } .foot { margin: 16px -16px -16px; padding: 10px 16px; } body { padding: 16px 12px; } .actions { flex-direction: column; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: 0.01ms !important; } }
+  </style></head><body><main><div class="brand"><span class="brand-title">AgentDock Bridge · Remote MCP Bastion</span><label class="dn-host" title="切换白天/夜间外观"><input type="checkbox" class="dn-input" aria-label="切换白天/夜间外观"><div class="components"><div class="main-button"><div class="moon"></div><div class="moon"></div><div class="moon"></div></div><div class="daytime-background dn-bg-1"></div><div class="daytime-background dn-bg-2"></div><div class="daytime-background dn-bg-3"></div><div class="cloud dn-cloud-1"></div><div class="cloud dn-cloud-2"></div><div class="cloud dn-cloud-3"></div><div class="cloud dn-cloud-4"></div><div class="stars dn-star-1"><div class="star-son"></div></div><div class="stars dn-star-2"><div class="star-son"></div></div><div class="stars dn-star-3"><div class="star-son"></div></div><div class="stars dn-star-4"><div class="star-son"></div></div></div></label></div>${content}</main></body></html>`;
 }
 
 function consentPage(details, handle, message = '') {
   const labels = { 'computer:read': '读取授权项目目录中的文件、列出目录与搜索内容', 'computer:write': '在授权项目目录中创建、编辑、删除文件', 'computer:execute': '在隔离的 Linux 开发容器内执行终端命令', offline_access: '允许客户端通过刷新令牌保持连接（最长 30 天）' };
   const client = details.clientDomain ? `客户端发布域名：<strong>${escapeHtml(details.clientDomain)}</strong>` : '客户端名称由申请者自行填写，请核对下面的回调地址。';
-  return documentPage('授权访问我的电脑', `<h1>授权访问我的电脑</h1><p><strong>${escapeHtml(details.clientName)}</strong> 请求通过 AgentDock Bridge 调用你的本机工具。</p><p>${client}</p><p>授权回调主机：<strong>${escapeHtml(details.redirectHost)}</strong><br><code>${escapeHtml(details.redirectUri)}</code></p>${details.redirectIsLoopback ? '<p class="notice">回调指向本机应用。仅当你刚刚从自己的 MCP 客户端发起连接时继续。</p>' : ''}<section class="permissions"><h2>本次授予的能力</h2><ul>${details.scope.map(scope => `<li>${escapeHtml(labels[scope] || scope)}</li>`).join('')}</ul></section><p class="notice">工具在隔离开发容器内访问你授权的项目目录。本机仍会逐项确认操作，容器联网需单独开启。调用内容与结果经过 Cloudflare 和所使用的模型平台，请仅授权可信客户端。</p>${message ? `<p role="alert" class="notice error">${escapeHtml(message)}</p>` : ''}<form method="post" action="/authorize"><input type="hidden" name="handle" value="${escapeHtml(handle)}"><label for="password">本机保存的连接密码</label><input id="password" name="password" type="password" autocomplete="current-password" maxlength="1024" required autofocus><div class="actions"><button name="decision" value="approve" type="submit">登录并允许上述访问</button><button class="secondary" name="decision" value="deny" type="submit" formnovalidate>拒绝</button></div></form><p class="foot">请只在 ${escapeHtml(new URL(details.redirectUri).origin === 'null' ? '你自己的网关域名' : 'bridge.example.test')} 页面输入连接密码。密码不会发送到客户端回调地址。授权表单将在 10 分钟后失效。</p>`);
+  return documentPage('授权访问我的电脑', `<h1>授权访问我的电脑</h1><p><strong>${escapeHtml(details.clientName)}</strong> 请求通过 AgentDock Bridge 调用你的本机工具。</p><p>${client}</p><p>授权回调主机：<strong>${escapeHtml(details.redirectHost)}</strong><br><code>${escapeHtml(details.redirectUri)}</code></p>${details.redirectIsLoopback ? '<p class="notice">回调指向本机应用。仅当你刚刚从自己的 MCP 客户端发起连接时继续。</p>' : ''}<section class="permissions"><h2>本次授予的能力</h2><ul>${details.scope.map(scope => `<li><span class="scope-tag">${escapeHtml(scope)}</span>${escapeHtml(labels[scope] || scope)}</li>`).join('')}</ul></section><p class="notice">工具在隔离开发容器内访问你授权的项目目录。本机仍会逐项确认操作，容器联网需单独开启。调用内容与结果经过 Cloudflare 和所使用的模型平台，请仅授权可信客户端。</p>${message ? `<p role="alert" class="notice error">${escapeHtml(message)}</p>` : ''}<form method="post" action="/authorize"><input type="hidden" name="handle" value="${escapeHtml(handle)}"><label for="password">本机保存的连接密码</label><input id="password" name="password" type="password" autocomplete="current-password" maxlength="1024" required autofocus><div class="actions"><button name="decision" value="approve" type="submit">登录并允许上述访问</button><button class="secondary" name="decision" value="deny" type="submit" formnovalidate>拒绝</button></div></form><p class="foot">请只在 ${escapeHtml(new URL(details.redirectUri).origin === 'null' ? '你自己的网关域名' : 'bridge.example.test')} 页面输入连接密码。密码不会发送到客户端回调地址。授权表单将在 10 分钟后失效。</p>`);
 }
 
 async function showConsent(oauth, authRequest, status = 200, message = '', priorHeaders) {
@@ -133,7 +385,7 @@ function provider(origin) {
   if (!providers.has(origin)) providers.set(origin, new OAuthProvider({
     apiRoute: '/mcp', apiHandler: mcpHandler, defaultHandler,
     authorizeEndpoint: `${origin}/authorize`, tokenEndpoint: `${origin}/oauth/token`, clientRegistrationEndpoint: `${origin}/register`,
-    resourceMetadata: { resource: `${origin}/mcp`, authorization_servers: [origin], resource_name: 'CyberNova Personal Computer' },
+    resourceMetadata: { resource: `${origin}/mcp`, authorization_servers: [origin], resource_name: 'AgentDock Personal Computer' },
     scopesSupported: OAUTH_SCOPES, requiredScopes: COMPUTER_SCOPES,
     accessTokenTTL: 3600, refreshTokenTTL: 30 * 86400, clientRegistrationTTL: 90 * 86400,
     tokenExchangeCallback({ scope, requestedScope }) {
@@ -153,7 +405,9 @@ function provider(origin) {
 async function route(request, env, context) {
   const origin = publicOrigin(env);
   const url = new URL(request.url);
-  if (url.origin !== origin) return json({ error: 'Use the configured gateway hostname.' }, 421);
+  const expectedHost = new URL(origin).host;
+  const isLoopback = url.hostname === '127.0.0.1' || url.hostname === 'localhost' || url.hostname === '[::1]';
+  if (url.origin !== origin && !isLoopback && url.host !== expectedHost) return json({ error: 'Use the configured gateway hostname.' }, 421);
   if (url.href.length > 12000) return json({ error: 'URL is too long.' }, 414);
   if (!allowedOrigin(request.headers.get('origin'), origin)) return json({ error: 'Origin is not allowed.' }, 403);
   const path = url.pathname;
@@ -168,7 +422,24 @@ async function route(request, env, context) {
     if (request.method === 'HEAD') return new Response(null, { status: status.status, headers: status.headers });
     return status;
   }
-  if (path === '/' && request.method === 'GET') return new Response(documentPage('我的电脑连接入口', '<h1>我的电脑连接入口</h1><p>这是 CyberNova 的私人 MCP 网关。</p><p>在自己的 MCP 客户端中填写：<br><code>https://bridge.example.test/mcp</code><br>认证方式选择 OAuth。</p><p>只有完成所有者登录与授权后，客户端才能请求本机工具。</p><p class="foot">本机连接器需要手动启动；电脑休眠或离线时无法执行请求。</p>'), { headers: pageHeaders() });
+  if (path === '/' && request.method === 'GET') return new Response(documentPage('远程连接入口', `
+    <h1>远程连接入口</h1>
+    <p>这是个人专用的安全 MCP 远程代理网关。</p>
+    <div class="endpoint-box">
+      <label>MCP 服务端点：</label>
+      <code>https://bridge.example.test/mcp</code>
+      <p class="sub">认证协议：OAuth 2.1 + PKCE (RFC 7636)</p>
+    </div>
+    <section class="permissions">
+      <h2>安全体系与边界隔离</h2>
+      <ul>
+        <li><span class="scope-tag">Zero-Trust</span>所有客户端请求必须经由所有者密码验证与 OAuth 授权凭证。</li>
+        <li><span class="scope-tag">Sandbox</span>受控宿主机执行器运行于独立 Linux 容器沙盒，严格限制文件系统根目录与网络出站。</li>
+        <li><span class="scope-tag">Durable Relay</span>基于 Cloudflare Workers Durable Objects 实现全双工加密控制流中继。</li>
+      </ul>
+    </section>
+    <p class="foot">宿主机连接器需手动启动；电脑休眠或离线时无法执行请求。</p>
+  `), { headers: pageHeaders() });
   if (path === '/mcp') {
     const version = request.headers.get('mcp-protocol-version');
     if (version && !PROTOCOL_VERSIONS.has(version)) return json({ error: 'Unsupported MCP protocol version.' }, 400);

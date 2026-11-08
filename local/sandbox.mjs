@@ -151,7 +151,7 @@ export async function createSandboxRuntime(config) {
       return result(snapshot(job));
     }
     if (closed) throw new Error('Operation cancelled.');
-    if (name === 'computer_context') return result({ name: 'CyberNova isolated development workspace', version: '2.0.0', platform: 'linux', shell: 'bash', roots: ['/workspace'], host_mount: root, default_cwd: '/workspace', command_execution: config.allowExec === true, image, security: 'Disposable containers. Read-only image. Development child uid 1000, no host home, credentials, Docker socket or published ports. Full project access is intentional; project-local secrets are readable. Outbound networking requires local approval.', limits: { concurrent_commands: 4, concurrent_file_requests: 4, memory: '2 GiB', cpus: 2, pids: 256 } });
+    if (name === 'computer_context') return result({ name: 'AgentDock isolated development workspace', version: '2.0.0', platform: 'linux', shell: 'bash', roots: ['/workspace'], host_mount: root, default_cwd: '/workspace', command_execution: config.allowExec === true, image, security: 'Disposable containers. Read-only image. Development child uid 1000, no host home, credentials, Docker socket or published ports. Full project access is intentional; project-local secrets are readable. Outbound networking requires local approval.', limits: { concurrent_commands: 4, concurrent_file_requests: 4, memory: '2 GiB', cpus: 2, pids: 256 } });
     if (name === 'exec_command') {
       if (config.allowExec !== true) throw new Error('Command execution is disabled.');
       if (typeof args.cmd !== 'string' || !args.cmd.isWellFormed() || !args.cmd.length || Buffer.byteLength(args.cmd) > 32768 || args.cmd.includes('\0')) throw new Error('Invalid command.');
