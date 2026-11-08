@@ -58,7 +58,7 @@
 
 ```sh
 node --test test/connector.test.mjs test/approval-budget.test.mjs test/sandbox-recovery.test.mjs
-npm run check
+pnpm run check
 ```
 
 连接器测试使用临时状态目录、本机测试 WebSocket 和假的运行器，检查单次批准、变更参数和跨重启去重；批准预算测试检查完整记录的字节上限。故障恢复测试直接导入沙箱源码，仅模拟 Docker 进程边界，检查清理失败后自有任务可查询、可停止，新操作仍被拒绝，以及跨客户端访问和取消仍被拦截。

@@ -2,7 +2,7 @@
 
 ## 命令与环境
 
-- Node.js 24+；开发检查 `npm run check`，回归 `npm test`，依赖按锁文件 `npm ci`。
+- Node.js 24+；开发检查 `pnpm run check`，回归 `pnpm test`，依赖按锁文件 `pnpm install --frozen-lockfile`。
 - Docker 集成需要显式启用测试开关和指定测试镜像；历史 `audit/`、`SECURITY-REVIEW.md` 不是当前通过标准。
 - 连接器从受保护安装副本运行；源码和 Docker 镜像更新不自动生效。操作前核对本机状态，安装、轮换、启动/停止与部署均需对应任务授权。
 
