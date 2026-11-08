@@ -20,7 +20,7 @@ It is intended for people who want remote access to their own development enviro
 
 - Windows x64, Windows PowerShell and .NET Framework for DPAPI credentials and host permission checks.
 - Docker Desktop with its Linux container engine. The installer uses the local `desktop-linux` context.
-- Trusted Node.js 24+ and npm for checkout dependencies, development checks and Wrangler. The installer separately installs and verifies a pinned Node runtime for the host connector.
+- Trusted Node.js 24+ and pnpm for checkout dependencies, development checks and Wrangler. The installer separately installs and verifies a pinned Node runtime for the host connector.
 - Your own Cloudflare account, Wrangler login and a working HTTPS domain. The Worker uses SQLite Durable Objects.
 - One project directory explicitly authorized for full container read/write access. The current default is all of `D:\Projects`, mounted at `/workspace`.
 

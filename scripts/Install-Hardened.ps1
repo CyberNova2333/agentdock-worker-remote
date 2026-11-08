@@ -27,10 +27,10 @@ $release='runtime-'+[DateTime]::UtcNow.ToString('yyyyMMdd-HHmmss')+'-'+[Guid]::N
 $destination=Join-Path $StateDir $release
 New-Item -ItemType Directory -Path $destination | Out-Null
 foreach($folder in @('local','scripts')){Copy-Item -LiteralPath (Join-Path $source $folder) -Destination $destination -Recurse}
-foreach($file in @('package.json','package-lock.json')){Copy-Item -LiteralPath (Join-Path $source $file) -Destination $destination}
+foreach($file in @('package.json','pnpm-lock.yaml')){Copy-Item -LiteralPath (Join-Path $source $file) -Destination $destination}
 Push-Location $destination
 try {
-  & $node $npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+  & $node $pnpm install --frozen-lockfile --omit=dev --ignore-scripts --no-audit --no-fund
   if($LASTEXITCODE -ne 0){throw 'Protected runtime dependency installation failed.'}
 } finally {Pop-Location}
 $configFile=Join-Path $StateDir 'config.json'
