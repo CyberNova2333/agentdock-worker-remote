@@ -59,3 +59,14 @@ Synced through 5ded65ef08bb6e15b81ce1e22b7fe66dda567abb
 - 验证范围：重新核对实际源码、精确符号、回归断言和已保存验收记录；本轮未执行业务回归、服务启停或部署。包许可元数据已更新，运行副本的 28 文件一致性仍按 `8e4afdd` 的既有快照解释。
 
 Synced through 8e4afdd2e62ff6f6e2fd58cada0a2b75a50abcc8
+
+## 2026-11-10 11:58 +08:00：README 切换 pnpm 指令并记录部署当日的安装器修复与部署专用值脱敏
+
+- 触发：用户要求把网关重新部署到既定域名并完成本机配置，随后要求筛查混入仓库的本机配置与个人信息、过滤后提交；发现中英根 README 仍残留 `npm.cmd` 指令，而仓库已无 `package-lock.json`，照做会直接失败；同步决策为 `foreground patch`。
+- 中英 README 的依赖安装、开发检查与文档站命令改为 pnpm 形式，与 `AGENTS.md`、`repo-docs/README.md` 一致；wrangler 调用保持 `node_modules\.bin` 形式不变。
+- 同轮部署事实：修复 `scripts/Install-Hardened.ps1` 运行副本依赖安装（补上锁文件内固定的 pnpm CLI 引用，并把 pnpm 12 已移除的 `--omit=dev --no-audit --no-fund` 调整为 `--frozen-lockfile --prod --ignore-scripts`）；重建并固定镜像 `agentdock-dev:2026-11-10`（镜像内 `/opt/bridge` 关键文件 SHA-256 与源码一致）；重装受保护运行副本（28 文件清单）。公网 `/healthz` 曾返回 `{"ok":true,"connectorOnline":true}`。
+- 部署专用值脱敏：移除云端页面与测试中的硬编码部署域名（首页端点改由 `PUBLIC_ORIGIN` 渲染，反钓鱼提示改通用文案，测试改用 `bridge.example.test`）；`Setup.ps1` 默认 Origin 改回示例地址；`Manage.ps1` 探针与 `Secrets.ps1` 密码窗口标题改读本机 `config.json` 的 `origin`；`record-deployment.mjs`/`record-hardening.mjs` 的 Cloudflare 账户 ID 与主机名改为显式命令行参数，并把安装清单核对中的 `package-lock.json` 对齐为 `pnpm-lock.yaml`。历史提交中仍含上述部署值，未获重写授权，按原样保留。
+- 部署环境注记：本机沙箱层曾向 `%USERPROFILE%\.agentdock-bridge` 与 `%USERPROFILE%\.agentdock-toolchains` 添加 `CodexSandboxUsers:(RX)` ACE，触发 `Assert-PrivateState` 拒绝全部可信入口；本次已移除并复核两树无多余主体。若再次出现同类拒绝，先检查这两个控制目录的 ACL。
+- 验证：`pnpm run check` 通过；`pnpm test` 101 项（99 通过、0 失败、2 项 Docker 集成测试在未启用 `AGENTDOCK_DOCKER_TEST` 时按预期跳过）。本轮未运行 Docker 集成回归，也未执行停止/重启公网验收。
+
+Synced through 90295b3（README 与安装器修复在工作树，未提交）
