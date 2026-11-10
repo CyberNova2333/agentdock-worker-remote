@@ -41,7 +41,7 @@ AgentDock Bridge 是自行管理 Windows 工程环境的个人 MCP 网关。MCP 
 
    编辑 `wrangler.jsonc`，核对目标账户、Worker 名称、域名绑定和 `PUBLIC_ORIGIN`。模板中的 `https://bridge.example.test` 必须换成自己的真实 HTTPS 地址；模板未包含特定账户和自定义域名路由。该配置不入版本控制。
 
-   核对部署脚本后再用于自己的域名：当前 `Manage.ps1` 的公网状态探针和 `Secrets.ps1` 的密码窗口标题仍含部署专用地址。核心连接地址来自本机 `origin` 与 Worker 的 `PUBLIC_ORIGIN`；移植时也应调整这些提示和状态探针。
+   保持本机配置的 `origin` 与 Worker 的 `PUBLIC_ORIGIN` 一致。`Manage.ps1` 的公网状态探针和 `Secrets.ps1` 的密码窗口标题都从本机 `config.json` 的 `origin` 读取地址。
 
 2. 显式指定同一个公开地址，初始化本机加密凭证并构建开发镜像：
 

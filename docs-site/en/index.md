@@ -45,10 +45,20 @@ This site and documentation have been translated by an AI language model. In cas
 
 ## Quick Start Demo
 
-```bash
-# 1. Install project dependencies
-pnpm install
+Validate the checkout with Node.js 24+ and pnpm 12.6.0:
 
-# 2. Run local tests
+```powershell
+pnpm install --frozen-lockfile
+pnpm run check
 pnpm test
 ```
+
+These commands verify the source. Follow the [deployment and installation instructions](https://github.com/CyberNova2333/agentdock-worker-remote/blob/main/README.en.md#first-configuration-and-installation) to configure the Cloudflare Worker, build the image and install the protected Windows connector.
+
+Add an HTTPS endpoint to a client that supports remote MCP and OAuth. For example:
+
+```text
+https://bridge.example.test/mcp
+```
+
+Replace the example domain with your deployment's `PUBLIC_ORIGIN`. Review the client callback and requested permissions, then authorize with the password shown by `Password.cmd` in the private installation directory. File operations and command execution also require approval of the exact request through `Approve.cmd` in that directory. See [Quick Start](/en/docs/) for the full flow.
