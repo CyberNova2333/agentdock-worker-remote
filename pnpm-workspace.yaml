@@ -1,3 +1,4 @@
 allowBuilds:
   esbuild: true
+  pnpm: false
   workerd: true

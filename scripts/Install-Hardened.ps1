@@ -20,6 +20,8 @@ $null=Assert-TrustedBinary $docker $workspacePath
 $nodeRuntime=& (Join-Path $PSScriptRoot 'Install-NodeRuntime.ps1') -StateDir $StateDir -Workspace $workspacePath -Proxy $Proxy
 $node=$nodeRuntime.nodePath
 $npm=$nodeRuntime.npmCli
+$pnpm=Join-Path $source 'node_modules\pnpm\bin\pnpm.mjs'
+if(-not(Test-Path -LiteralPath $pnpm)){throw 'Run pnpm install in the reviewed checkout before installing the runtime.'}
 Clear-NodeOverrides
 $imageId=(& $docker --context desktop-linux image inspect $Image --format '{{.Id}}').Trim()
 if($LASTEXITCODE -ne 0 -or $imageId -notmatch '^sha256:[a-f0-9]{64}$'){throw 'Build and verify the development image first.'}
@@ -30,7 +32,7 @@ foreach($folder in @('local','scripts')){Copy-Item -LiteralPath (Join-Path $sour
 foreach($file in @('package.json','pnpm-lock.yaml')){Copy-Item -LiteralPath (Join-Path $source $file) -Destination $destination}
 Push-Location $destination
 try {
-  & $node $pnpm install --frozen-lockfile --omit=dev --ignore-scripts --no-audit --no-fund
+  & $node $pnpm install --frozen-lockfile --prod --ignore-scripts
   if($LASTEXITCODE -ne 0){throw 'Protected runtime dependency installation failed.'}
 } finally {Pop-Location}
 $configFile=Join-Path $StateDir 'config.json'
