@@ -52,7 +52,9 @@ try {
     [Console]::Write(($data|ConvertTo-Json -Compress))
   } elseif($Action -eq 'ShowPassword') {
     Add-Type -AssemblyName System.Windows.Forms
-    [Windows.Forms.MessageBox]::Show($data.ownerPassword,"bridge.example.test - login password (do not share)") | Out-Null
+    $configFile=Join-Path $StateDir 'config.json'
+    $site=if(Test-Path -LiteralPath $configFile){(Get-Content -LiteralPath $configFile -Raw|ConvertFrom-Json).origin}else{'your bridge origin'}
+    [Windows.Forms.MessageBox]::Show($data.ownerPassword,"$site - login password (do not share)") | Out-Null
   } elseif($Action -eq 'Upload') {
     $root=Split-Path -Parent $PSScriptRoot
     $wrangler=Join-Path $root 'node_modules\.bin\wrangler.cmd'

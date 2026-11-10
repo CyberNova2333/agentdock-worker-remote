@@ -34,7 +34,11 @@ if($Action -eq 'Status') {
   [pscustomobject]@{supervisorAlive=[bool]$supervisor;connectorAlive=[bool]$child;stateDirectory=$StateDir}|ConvertTo-Json
   $status=Join-Path $StateDir 'connector-status.json'
   if(Test-Path -LiteralPath $status){Get-Content -LiteralPath $status -Raw}
-  try {Invoke-RestMethod 'https://bridge.example.test/healthz' -TimeoutSec 15|ConvertTo-Json}catch{'Public health request failed.'}
+  $configFile=Join-Path $StateDir 'config.json'
+  if(Test-Path -LiteralPath $configFile){
+    $origin=(Get-Content -LiteralPath $configFile -Raw|ConvertFrom-Json).origin
+    try {Invoke-RestMethod ($origin.TrimEnd('/')+'/healthz') -TimeoutSec 15|ConvertTo-Json}catch{'Public health request failed.'}
+  } else {'No configuration found; health probe skipped.'}
   exit
 }
 if($Action -eq 'Stop') {
