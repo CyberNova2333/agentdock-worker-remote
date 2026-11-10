@@ -40,7 +40,7 @@ Run these commands from a reviewed checkout for a new installation. Initializati
 
    Edit `wrangler.jsonc` for your target account, Worker name, domain binding and `PUBLIC_ORIGIN`. Replace `https://bridge.example.test` with your real HTTPS address. The template does not contain a specific account or custom-domain route. This local configuration is excluded from version control.
 
-   Review deployment-specific script values before using another domain: the public status probe in `Manage.ps1` and the password window title in `Secrets.ps1` still contain the original deployment address. Core connections use the local `origin` and the Worker's `PUBLIC_ORIGIN`; adapt those prompts and probes when porting the deployment.
+   Keep the local `origin` consistent with the Worker's `PUBLIC_ORIGIN`. The public status probe in `Manage.ps1` and the password window title in `Secrets.ps1` both read the address from `origin` in the local `config.json`.
 
 2. Explicitly use the same public address to initialize encrypted local credentials and build the development image:
 

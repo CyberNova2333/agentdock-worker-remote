@@ -41,27 +41,23 @@ features:
 
 ## 快速上手演示
 
-```bash
-# 1. 安装依赖
-pnpm install
+在 Node.js 24+ 和 pnpm 12.6.0 环境中验证检出源码：
 
-# 2. 本地连通性与配置检查
+```powershell
+pnpm install --frozen-lockfile
+pnpm run check
 pnpm test
-
-# 3. 接入 MCP 客户端（如 claude_desktop_config.json 或 mcp_config.json）
-{
-  "mcpServers": {
-    "agentdock-bridge": {
-      "command": "node",
-      "args": ["C:/path/to/agentdock-worker-remote/dist/index.js"],
-      "env": {
-        "AGENTDOCK_GATEWAY_URL": "https://gateway.example.com",
-        "AGENTDOCK_TOKEN": "your-hmac-secret-token"
-      }
-    }
-  }
-}
 ```
+
+这些命令只验证源码。首次使用时，按[部署与安装说明](https://github.com/CyberNova2333/agentdock-worker-remote/blob/main/README.md#首次配置与安装)配置 Cloudflare Worker、构建镜像并安装 Windows 受保护连接器。
+
+在支持远端 MCP 与 OAuth 的客户端中添加 HTTPS 地址，例如：
+
+```text
+https://bridge.example.test/mcp
+```
+
+将示例域名替换为部署配置的 `PUBLIC_ORIGIN`。核对客户端回调和申请权限后，使用私有安装目录中 `Password.cmd` 显示的密码完成网关授权。文件操作和命令执行还需通过同一目录中的 `Approve.cmd` 批准精确请求；完整流程见[快速入门](/docs/)。
 
 ## 文档分层导航
 
