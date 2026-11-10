@@ -21,12 +21,14 @@ const skipped = Number(testOutput.match(/skipped (\d+)/)?.[1]);
 const cancelled = Number(testOutput.match(/cancelled (\d+)/)?.[1]);
 if (!acceptance.success || !lifecycle.success || !passed || failed !== 0 || skipped !== 0 || cancelled !== 0) throw new Error('Verification is incomplete');
 if (!config.nodeRoot || !/^[a-f0-9]{64}$/.test(config.nodeSha256 || '') || crypto.createHash('sha256').update(await fs.readFile(config.nodePath)).digest('hex') !== config.nodeSha256) throw new Error('Private Node integrity verification failed');
-const account = '00000000000000000000000000000000';
+const [account] = process.argv.slice(2);
+if (!/^[a-f0-9]{32}$/.test(account || '')) throw new Error('Usage: node scripts/record-hardening.mjs <cloudflare-account-id>');
+const hostname = new URL(config.origin).hostname;
 const [domains, deployments] = await Promise.all([
   cloudflare(`/accounts/${account}/workers/domains`),
   cloudflare(`/accounts/${account}/workers/scripts/agentdock-bridge/deployments`),
 ]);
-if (!domains.some(domain => domain.hostname === 'bridge.example.test' && domain.service === 'agentdock-bridge')) throw new Error('Domain binding mismatch');
+if (!domains.some(domain => domain.hostname === hostname && domain.service === 'agentdock-bridge')) throw new Error('Domain binding mismatch');
 const proxy = proxyCandidates().find(Boolean);
 const health = await new Promise((resolve, reject) => {
   const req = https.get(`${config.origin}/healthz`, { timeout: 15000, agent: proxy ? new HttpsProxyAgent(proxy) : undefined }, res => {
@@ -54,7 +56,7 @@ for (const [relative, hash] of Object.entries(installation.sha256)) {
 }
 const installedFiles = new Set(Object.keys(installation.sha256).map(relative => relative.replaceAll('\\', '/')));
 for (const relative of Object.keys(hashes)) {
-  if ((relative.startsWith('local/') || relative.startsWith('scripts/') || ['package.json', 'package-lock.json'].includes(relative)) && !installedFiles.has(relative)) throw new Error('Reviewed runtime file is missing from the installation');
+  if ((relative.startsWith('local/') || relative.startsWith('scripts/') || ['package.json', 'pnpm-lock.yaml'].includes(relative)) && !installedFiles.has(relative)) throw new Error('Reviewed runtime file is missing from the installation');
 }
 const inventory = await exec(config.sandbox.dockerPath, ['--context', config.sandbox.context, 'run', '--rm', '--network', 'none', '--read-only', '--entrypoint', '/bin/cat', config.sandbox.image, '/opt/bridge/os-packages.txt', '/opt/bridge/npm-packages.json'], { windowsHide: true, timeout: 15000, maxBuffer: 1024 * 1024 });
 await fs.writeFile(path.join(root, 'artifacts/container-packages.txt'), inventory.stdout);

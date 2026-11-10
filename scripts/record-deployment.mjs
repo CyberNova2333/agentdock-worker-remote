@@ -7,9 +7,11 @@ import { cloudflare } from './cloudflare-api.mjs';
 import { proxyCandidates } from '../local/connector.mjs';
 
 const root = path.resolve(import.meta.dirname, '..');
-const account = '00000000000000000000000000000000';
 const worker = 'agentdock-bridge';
-const hostname = 'bridge.example.test';
+const [account, hostname] = process.argv.slice(2);
+if (!/^[a-f0-9]{32}$/.test(account || '') || !/^[a-z0-9.-]+$/i.test(hostname || '')) {
+  throw new Error('Usage: node scripts/record-deployment.mjs <cloudflare-account-id> <public-hostname>');
+}
 const [domains, deployments] = await Promise.all([
   cloudflare(`/accounts/${account}/workers/domains`),
   cloudflare(`/accounts/${account}/workers/scripts/${worker}/deployments`),
