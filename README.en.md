@@ -33,7 +33,7 @@ Run these commands from a reviewed checkout for a new installation. Initializati
 1. Install development dependencies and create the local deployment configuration:
 
    ```powershell
-   npm.cmd ci
+   pnpm install --frozen-lockfile
    Copy-Item wrangler.jsonc.example wrangler.jsonc
    .\node_modules\.bin\wrangler.cmd login
    ```
@@ -124,9 +124,9 @@ See the [source guide](repo-docs/README.md) for implementation paths and the [se
 Run in a trusted development environment:
 
 ```powershell
-npm.cmd ci
-npm.cmd run check
-npm.cmd test
+pnpm install --frozen-lockfile
+pnpm run check
+pnpm test
 ```
 
 Docker integration checks must be explicitly enabled with a chosen, already built image. The following command runs the complete test entry points serially:
@@ -151,9 +151,9 @@ The [Chinese source guide](repo-docs/README.md) is a Lite guide with a code map,
 The documentation site uses the default VitePress theme. Content lives only in `repo-docs/` and is included by the site:
 
 ```powershell
-npm.cmd --prefix docs-site ci
-npm.cmd --prefix docs-site run docs:dev -- --host 127.0.0.1
-npm.cmd --prefix docs-site run docs:build
+pnpm --dir docs-site install --frozen-lockfile
+pnpm --dir docs-site run docs:dev -- --host 127.0.0.1
+pnpm --dir docs-site run docs:build
 ```
 
 Default output is `docs-site/.vitepress/dist/`; append `-- --outDir <external-absolute-directory>` to the build command for an isolated output. The standalone site shows repository source links as exact paths and does not publish source or local resources with its pages.

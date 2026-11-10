@@ -34,7 +34,7 @@ AgentDock Bridge 是自行管理 Windows 工程环境的个人 MCP 网关。MCP 
 1. 安装开发依赖，并创建本机部署配置：
 
    ```powershell
-   npm.cmd ci
+   pnpm install --frozen-lockfile
    Copy-Item wrangler.jsonc.example wrangler.jsonc
    .\node_modules\.bin\wrangler.cmd login
    ```
@@ -125,9 +125,9 @@ MCP 入口为 `PUBLIC_ORIGIN` 下的 `/mcp`。在客户端添加该地址，核�
 在可信开发环境中运行：
 
 ```powershell
-npm.cmd ci
-npm.cmd run check
-npm.cmd test
+pnpm install --frozen-lockfile
+pnpm run check
+pnpm test
 ```
 
 Docker 集成测试需明确启用并选定已构建的镜像；以下命令串行运行完整测试入口：
@@ -152,9 +152,9 @@ node --test --test-concurrency=1 test/*.test.mjs cloud/*.test.mjs
 文档站使用 VitePress 默认主题，内容只维护在 `repo-docs/`，站点通过 include 读取：
 
 ```powershell
-npm.cmd --prefix docs-site ci
-npm.cmd --prefix docs-site run docs:dev -- --host 127.0.0.1
-npm.cmd --prefix docs-site run docs:build
+pnpm --dir docs-site install --frozen-lockfile
+pnpm --dir docs-site run docs:dev -- --host 127.0.0.1
+pnpm --dir docs-site run docs:build
 ```
 
 默认输出为 `docs-site/.vitepress/dist/`，构建命令可追加 `-- --outDir <仓库外绝对目录>`。独立文档站把仓库源码链接显示为精确路径，不随页面发布源码或本机资源。
