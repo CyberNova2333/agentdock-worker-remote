@@ -33,3 +33,10 @@ Choose `none`, `answer-only`, `foreground patch`, or `background sync`. Patch th
 维护守卫安装命令为 `python tools/repo_maintenance_guard.py install`。仅在明确安装任务下执行；文档修改不自动安装或更改 Git 配置。保留已有安全钩子，安装与验证结果按实际执行另行记录。
 
 文档站统一使用 VitePress 默认主题；样式与动效遵循原生主题，构建输出独立于业务界面。
+
+## 项目简介与主页元数据 (meta.json)
+
+- **项目名称**：AgentDock Bridge · 云端 AI 会话与本机环境的 MCP 桥接工具
+- **项目简介**：把云端 AI 会话连接到本机 Windows 开发目录的个人 MCP 桥接小工具，通过 Cloudflare Worker 做 OAuth 鉴权，并要求本机逐条审批后在 Linux 容器中执行命令。
+- **公开状态**：已公开 (public) · 分类：`ai-agent` · 主语言：`TypeScript`
+- **元数据说明**：仓库根目录的 [`meta.json`](meta.json) 供个人主页（[`cybernova-homepage`](https://github.com/CyberNova2333/cybernova-homepage)）读取项目简介、功能说明、技术栈和常用命令。修改项目主要功能、技术栈或文档站链接时请同步更新 `meta.json`。

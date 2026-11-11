@@ -1,0 +1,65 @@
+{
+  "$schema": "https://raw.githubusercontent.com/CyberNova2333/cybernova-homepage/main/public/schemas/repo-meta.v1.json",
+  "schemaVersion": 1,
+  "slug": "agentdock-worker-remote",
+  "name": "AgentDock Bridge",
+  "title": {
+    "zh": "AgentDock Bridge · 云端 AI 会话与本机环境的 MCP 桥接工具",
+    "en": "AgentDock Bridge · Remote MCP Bridge with Local Windows Approval"
+  },
+  "visibility": "public",
+  "status": "active",
+  "category": "ai-agent",
+  "featured": true,
+  "order": 6,
+  "repository": "https://github.com/CyberNova2333/agentdock-worker-remote",
+  "homepage": "https://cybernova2333.github.io/agentdock-worker-remote/",
+  "docsUrl": "https://cybernova2333.github.io/agentdock-worker-remote/docs/",
+  "license": "GPL-3.0-only",
+  "primaryLanguage": "TypeScript",
+  "techStack": [
+    "Cloudflare Workers",
+    "Durable Objects",
+    "MCP",
+    "Docker",
+    "PowerShell",
+    "DPAPI",
+    "TypeScript"
+  ],
+  "tags": [
+    "mcp-gateway",
+    "remote-workspace",
+    "docker-sandbox",
+    "cloudflare-workers"
+  ],
+  "summary": {
+    "zh": "把云端 AI 会话连接到本机 Windows 开发目录的个人 MCP 桥接小工具，通过 Cloudflare Worker 做 OAuth 鉴权，并要求本机逐条审批后在 Linux 容器中执行命令。",
+    "en": "Personal MCP bridge connecting cloud AI sessions to local Windows folders via Cloudflare Worker OAuth, local per-request approval, and Linux Docker containers."
+  },
+  "highlights": {
+    "zh": [
+      "每次读写文件或执行命令都需要在 Windows 本机连接器上手动确认，单次有效",
+      "命令在非特权、只读根文件系统的 Linux Docker 容器内运行，不挂载宿主敏感目录与 Docker Socket",
+      "使用 Windows DPAPI 保存本机凭据，并检查路径中的符号链接与目录越界"
+    ],
+    "en": [
+      "Requires explicit local approval on Windows for each file or shell request",
+      "Runs commands inside non-privileged, read-only Linux Docker containers without mounting host sensitive paths",
+      "Stores local credentials with Windows DPAPI and checks for symlink or path traversal"
+    ]
+  },
+  "quickStart": [
+    "pnpm install --frozen-lockfile",
+    "pnpm run check",
+    "pnpm test"
+  ],
+  "roadmap": {
+    "stage": "日常维护",
+    "stageEn": "Maintained",
+    "milestone": {
+      "zh": "已完成 Worker 鉴权、本机审批脚本与容器隔离执行流程。",
+      "en": "Worker OAuth, local approval connector, and container execution are complete."
+    }
+  },
+  "updatedAt": "2026-11-11"
+}
