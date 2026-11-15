@@ -83,3 +83,12 @@ Synced through 90295b3（README 与安装器修复在工作树，未提交）
 - 文档验证：VitePress 构建通过；指南校验 0 errors、1 warning（既有 `DESIGN.md` 缺少同步规则提示）。
 
 Synced through 110e5cd6a1219ea4448d94c3f897b65e92d3d081
+
+## 2026-11-15：升级 Standard 源码指南并重置文档站与双语入口
+
+- 触发：全仓文档体系重构（Tier B），从“Lite 加代码地图”升级为完整 Standard 体系，清除 `docs-site/` 中的历史通用模板文案并按“一处事实，一处归属”重划根目录 README、文档站与源码指南边界。
+- 新增 `repo-docs/modules/` 三篇概念模块（云端 OAuth 2.1 与中继、本地精确批准与防重放账本、容器沙箱与文件安全策略）与 `repo-docs/glossary.md`（覆盖反复出现的专有符号与状态码）；同步补齐 `code-map.md` 中 `test/` 分节，校准 `walkthroughs/one-real-run.md`、`source-evidence.md` 与 `quality-review.md`。
+- 本轮核对事实：核实当前 HEAD `56ee943` 下的全部源码模块与 `wrangler.jsonc.example`、`scripts/*.ps1`、Root `.cmd` 入口；补充说明 `cloud/index.mjs`（`READ_TOOLS`/`EXEC_TOOLS`）与 `local/request-policy.mjs`（10 项 `toolScopes`）工具集收敛差异，以及当前生产连接器强依赖 Windows DPAPI 与 PowerShell ACL 的平台边界。
+- 实测基线：`pnpm run check` 通过；`pnpm test` 运行 101 项测试（Linux 环境下 86 项通过、0 失败、15 项 Windows/Docker 专属测试按条件跳过）。不把文档刷新视作 Windows 实机或公网再部署验收。
+
+Synced through 56ee943

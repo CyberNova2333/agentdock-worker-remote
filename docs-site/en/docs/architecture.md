@@ -1,40 +1,64 @@
 ---
-title: System Architecture & Design
-description: Architectural design, component relationships, and runtime execution flow of AgentDock Bridge Gateway.
+title: Architecture & Security ADRs
+description: Three-tier isolation model, interactive topology diagram, diagram-vs-source protocol notes, and key security ADRs.
 ---
 
 ::: warning AI Translation Notice
-This document was translated by an AI language model. In case of any discrepancies or ambiguities, please refer to the [original Chinese documentation](/docs/architecture) as the authoritative reference.
+Translated/synchronized from the authoritative Chinese documentation ([架构全景与安全决策](/docs/architecture)). Check source files or Chinese docs if subtle phrasing differs.
 :::
 
-# System Architecture & Design
+# Architecture & Security ADRs
 
-## Interactive Architecture Overview
+AgentDock Bridge enforces three strict separation planes: **no persisted workspace secrets on Cloudflare**, **no direct host command/file execution in the connector process**, and **no host tokens or default outbound networking inside the Linux container**.
+
+## Interactive Topology Diagram
 
 <div class="archify-diagram-card" style="margin: 1.5rem 0; border: 1px solid var(--vp-c-border); border-radius: 12px; overflow: hidden; background: var(--vp-c-bg-soft); box-shadow: 0 4px 16px rgba(0,0,0,0.06);">
   <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 18px; background: var(--vp-c-bg-elv); border-bottom: 1px solid var(--vp-c-border); font-size: 13px;">
     <span style="font-weight: 600; color: var(--vp-c-text-1); display: flex; align-items: center; gap: 8px;">
-      <span style="font-size: 16px;">📐</span> AgentDock Bridge Architecture (Archify interactive diagram; pan / zoom / inspect supported)
+      <span>📐</span> AgentDock Bridge Topology (pan / zoom / inspect supported)
     </span>
-    <a href="/diagrams/agentdock-worker-remote-architecture.html" target="_blank" rel="noreferrer" style="font-size: 12px; color: var(--vp-c-brand-1); text-decoration: none; font-weight: 500;">
+    <a href="/diagrams/worker-architecture.html" target="_blank" rel="noreferrer" style="font-size: 12px; color: var(--vp-c-brand-1); text-decoration: none; font-weight: 500;">
       Open Fullscreen ↗
     </a>
   </div>
-  <iframe src="/diagrams/agentdock-worker-remote-architecture.html" width="100%" height="520px" frameborder="0" style="display: block; border: none;" allowfullscreen loading="lazy"></iframe>
+  <iframe src="/diagrams/worker-architecture.html" width="100%" height="520px" frameborder="0" style="display: block; border: none;" allowfullscreen loading="lazy"></iframe>
 </div>
 
----
+> **Diagram vs. Source Note**: The visual diagram summarizes the four zones at a conceptual level. In actual code, client RPCs use stateless HTTP `POST /mcp` (JSON-RPC 2.0 rather than SSE log streams), `OAuth 2.1 + PKCE (S256)`, an outbound `WSS /bridge` WebSocket from the host connector, and per-call `docker create` + `docker start --attach` after `Approve.cmd`.
 
-## Core Design Principles
+## Core Subsystem Handoff
 
-1. **Clear Layering & Single Responsibility**: Each module maintains explicit boundaries without cross-domain privilege escalation.
-2. **Security & Isolation First**: Protected secrets, sensitive credentials, and untrusted execution contexts are strictly decoupled.
-3. **Out-of-the-Box & Self-Contained**: Minimal external dependencies; core runtime guarantees deterministic behavior and rapid startup.
+- **Cloudflare Worker (`cloud/`)**: Routes public traffic, runs `AuthCoordinator` (`owner-v2-*` SQLite DO) for OAuth 2.1 + PKCE + refresh rotation, and forwards validated JSON-RPC envelopes via `BridgeRelay` (`primary` DO).
+- **Windows Host Connector (`local/` + `scripts/`)**: Decrypts `secrets.dpapi` in a sanitized PowerShell subprocess, re-validates envelopes (`validateRequestEnvelope`), enforces exact canonical SHA-256 approvals (`Approve.cmd`) and pre-execution `RequestReceipts`, checks NTFS DACLs before file replacement, and drives the Docker CLI.
+- **Linux Sandbox (`container/`)**: Runs PID 1 `runner.mjs` (20s host lease watchdog, UID/GID 1000) dispatching either `bash --noprofile --norc` or `file-worker.mjs` (`allowExec: false` + `file-safety.mjs`).
 
----
+Follow a single call end-to-end in [End-to-End Request Walkthrough](/en/docs/walkthrough) or locate files in [Source & Test Code Map](/en/docs/code-map).
 
-## Runtime Lifecycle & Data Flow
+## Security ADRs and Migration {#security-adrs-and-migration}
 
-- **Stage 1: Input Ingestion & Preflight Validation**: Accepts incoming calls, verifies schemas, and validates security parameters.
-- **Stage 2: Policy Arbitration & State Coordination**: Routes decisions based on configured security policies and runtime state.
-- **Stage 3: Controlled Execution & Persistent Receipting**: Executes operations within sandboxed boundaries and persists verifiable state.
+### ADR-01: Password-Hash Generation Isolation (`owner-v2-*`) & CIMD Metadata Repair
+
+To prevent downgraded CIMD or legacy grants from surviving re-authorization or password changes (`R4-01`), `AuthStore.completeMetadata` reconstructs canonical `grant:*` metadata on every write/list, and `cloud/index.mjs` namespaces `AuthCoordinator` as `owner-v2-${sha256(OWNER_PASSWORD_HASH)}`. Any password rotation invalidates all prior grants immediately; clients must re-authorize.
+
+### ADR-02: Out-of-Lock Preparation & Optimistic Revision Commits
+
+To keep slow HTTP uploads or external CIMD/JWKS fetches from blocking all OAuth and MCP traffic (`R4-03`), `cloud/index.mjs` buffers bounded request bodies before entering `AuthCoordinator`, and `AuthTransactions` executes preparation outside `AuthQueue`, checking `revision` before synchronous SQLite commits with lane caps (`authorization: 4`, `mcp: 32`, `stop: 4`) and 4 retries.
+
+### ADR-03: Dedicated Stop Lane & Cleanup-Failure Fallback
+
+To ensure a saturated control receipt cache or failed `docker rm -f` never prevents an owner from stopping active jobs (`R4-04` / `FINAL-01`), `stop_command` has dedicated concurrency limits and `StopReceipts` (128 FIFO), and `sandbox.mjs` evaluates owner-scoped `command_status`/`get_command`/`stop_command` **before** rejecting new operations under `closed = true`.
+
+### ADR-04: Compact JSON Approval Budget, Merged CSP & Host Hardening
+
+`approval-store.mjs` validates compact UTF-8 size (`1,200,000 B`) before temp-file creation; `/authorize` merges rather than overwrites zero-script CSP headers; `Install-NodeRuntime.ps1` pins Node `24.22.1` (SHA-256 + OpenJS signature) inside ACL-verified private toolchains; `windows-acl.mjs` refuses atomic Linux `rename` over files with custom explicit NTFS DACLs.
+
+### Upgrade Checklist
+
+1. Run `pnpm install --frozen-lockfile && pnpm run check && pnpm test` in the updated checkout.
+2. Run `Stop.cmd`, rebuild `container/Dockerfile`, and re-run `.\scripts\Install-Hardened.ps1 -Workspace "<workspace-path>"` (preserves `%USERPROFILE%\.agentdock-bridge` DPAPI secrets and receipts).
+3. Run `pnpm run deploy` if `cloud/` or `wrangler.jsonc` changed, then restart with `Start.cmd` and verify `Status.cmd`.
+
+## Evidence & Verification Boundaries
+
+Verification logs for real Windows ACLs, pinned Docker runs, and live Cloudflare endpoints belong to the specific commit snapshots in `SECURITY-FIXES.md`. Cross-platform doc/test checks on Linux automatically skip the 15 Windows/Docker-specific cases.

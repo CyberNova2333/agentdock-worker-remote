@@ -1,102 +1,112 @@
-// VitePress 官方文档配置 (Coolify 架构风格 + 中英双语支持)
 import { defineConfig } from 'vitepress'
+import { guideLinks } from './guide-links.mts'
+
+const guidePages: Record<string, string> = {
+  'README.md': 'docs/',
+  'walkthroughs/one-real-run.md': 'docs/walkthrough',
+  'code-map.md': 'docs/code-map',
+  'modules/cloud-oauth-and-relay.md': 'docs/contracts#cloud-oauth-relay',
+  'modules/local-approval-and-replay.md': 'docs/contracts#local-approval-replay',
+  'modules/container-sandbox-and-file-policy.md': 'docs/contracts#container-sandbox-policy',
+  'glossary.md': 'docs/architecture#glossary-index',
+  'references/source-evidence.md': 'docs/architecture#evidence-and-boundaries',
+  'references/quality-review.md': 'docs/architecture#evidence-and-boundaries',
+  'change-log.md': 'docs/architecture#security-adrs-migration',
+}
 
 export default defineConfig({
   cleanUrls: true,
+  markdown: {
+    config: guideLinks(guidePages),
+  },
   locales: {
     root: {
       label: '简体中文',
       lang: 'zh-CN',
-      title: "AgentDock Bridge 官方文档",
-      description: "AgentDock Bridge 是专为 AI Agent 容器与边缘计算环境打造的远程指令调度与沙箱通道桥接网关。",
+      title: 'AgentDock Bridge 文档',
+      description: 'Cloudflare Workers OAuth 2.1 + Windows 受保护连接器 + 只读 Linux Docker 沙箱的个人远程 MCP 桥接网关。',
       themeConfig: {
-        siteTitle: "AgentDock Bridge",
+        siteTitle: 'AgentDock Bridge',
         nav: [
-          { text: '官网首页', link: '/' },
-          { text: '快速入门', link: '/docs/' },
-          { text: '系统架构', link: '/docs/architecture' },
-          { text: '配置指南', link: '/docs/configuration' },
-          { text: '常见问题', link: '/docs/faq' },
+          { text: '首页', link: '/' },
+          { text: '起步与部署', link: '/docs/' },
+          { text: '契约与边界', link: '/docs/contracts' },
+          { text: '原理与导览', link: '/docs/architecture' },
           { text: 'GitHub', link: 'https://github.com/CyberNova2333/agentdock-worker-remote' },
         ],
         sidebar: [
           {
-            text: '快速入门',
+            text: '1. 起步与配置部署',
             items: [
-              { text: '项目概览与上手', link: '/docs/' },
-            ]
+              { text: '项目定位与部署流程', link: '/docs/' },
+              { text: '配置矩阵与运维脚本', link: '/docs/configuration' },
+              { text: '部署与运行排错 FAQ', link: '/docs/faq' },
+            ],
           },
           {
-            text: '系统架构',
+            text: '2. 接口与扩展契约',
             items: [
-              { text: '架构设计与全景图', link: '/docs/architecture' },
-            ]
+              { text: 'OAuth、工具、批准与沙箱契约', link: '/docs/contracts' },
+            ],
           },
           {
-            text: '配置与实践',
+            text: '3. 原理与源码导览',
             items: [
-              { text: '配置与使用指南', link: '/docs/configuration' },
-            ]
+              { text: '架构全景与安全决策', link: '/docs/architecture' },
+              { text: '一次请求端到端走查', link: '/docs/walkthrough' },
+              { text: '源码目录与测试地图', link: '/docs/code-map' },
+            ],
           },
-          {
-            text: '运维与支持',
-            items: [
-              { text: '常见问题与排错', link: '/docs/faq' },
-            ]
-          }
         ],
         outline: { level: [2, 3], label: '本页目录' },
         docFooter: { prev: '上一页', next: '下一页' },
-      }
+      },
     },
     en: {
       label: 'English',
       lang: 'en-US',
       link: '/en/',
-      title: "AgentDock Bridge Documentation",
-      description: "AgentDock Bridge is a remote command scheduling and sandbox channel bridge gateway designed for AI agent containers and edge compute environments.",
+      title: 'AgentDock Bridge Documentation',
+      description: 'Personal authenticated remote MCP bridge combining Cloudflare Workers OAuth 2.1, hardened Windows host approval, and read-only Linux Docker sandboxes.',
       themeConfig: {
-        siteTitle: "AgentDock Bridge",
+        siteTitle: 'AgentDock Bridge',
         nav: [
           { text: 'Home', link: '/en/' },
-          { text: 'Quick Start', link: '/en/docs/' },
+          { text: 'Getting Started', link: '/en/docs/' },
+          { text: 'Contracts', link: '/en/docs/contracts' },
           { text: 'Architecture', link: '/en/docs/architecture' },
-          { text: 'Configuration', link: '/en/docs/configuration' },
-          { text: 'FAQ', link: '/en/docs/faq' },
           { text: 'GitHub', link: 'https://github.com/CyberNova2333/agentdock-worker-remote' },
         ],
         sidebar: [
           {
-            text: 'Quick Start',
+            text: '1. Getting Started & Deployment',
             items: [
-              { text: 'Overview & Getting Started', link: '/en/docs/' },
-            ]
+              { text: 'Overview & Setup Workflow', link: '/en/docs/' },
+              { text: 'Configuration & Scripts Matrix', link: '/en/docs/configuration' },
+              { text: 'Deployment & Runtime FAQ', link: '/en/docs/faq' },
+            ],
           },
           {
-            text: 'Architecture',
+            text: '2. Contracts & Boundaries',
             items: [
-              { text: 'Architecture Design', link: '/en/docs/architecture' },
-            ]
+              { text: 'OAuth, Tools, Approval & Sandbox', link: '/en/docs/contracts' },
+            ],
           },
           {
-            text: 'Configuration & Practice',
+            text: '3. Internals & Code Map',
             items: [
-              { text: 'Configuration Guide', link: '/en/docs/configuration' },
-            ]
+              { text: 'Architecture & Security ADRs', link: '/en/docs/architecture' },
+              { text: 'End-to-End Request Walkthrough', link: '/en/docs/walkthrough' },
+              { text: 'Source & Test Code Map', link: '/en/docs/code-map' },
+            ],
           },
-          {
-            text: 'Operations & Support',
-            items: [
-              { text: 'FAQ & Diagnostics', link: '/en/docs/faq' },
-            ]
-          }
         ],
         outline: { level: [2, 3], label: 'On this page' },
         docFooter: { prev: 'Previous page', next: 'Next page' },
-      }
-    }
+      },
+    },
   },
   themeConfig: {
     search: { provider: 'local' },
-  }
+  },
 })
