@@ -7,13 +7,13 @@ hero:
   tagline: Authenticates remote MCP clients via Cloudflare Workers OAuth 2.1 + PKCE, requires exact manual approval on a hardened Windows host, and executes workspace tools in a read-only Linux Docker container.
   actions:
     - theme: brand
-      text: 1. Getting Started
+      text: Getting Started
       link: /en/docs/
     - theme: alt
-      text: 2. Contracts & Boundaries
+      text: Contracts & Boundaries
       link: /en/docs/contracts
     - theme: alt
-      text: 3. Internals & Code Map
+      text: Internals & Code Map
       link: /en/docs/architecture
     - theme: alt
       text: GitHub Repo
@@ -31,15 +31,6 @@ features:
 ::: warning AI Translation Notice
 English documentation pages are translated/synchronized from the authoritative Chinese source ([简体中文首页](/)) using inspected repository facts. Refer to the Chinese pages or source files if any subtle phrasing differs.
 :::
-
-## Quick Jump by Role & Goal
-
-| Role / Goal | Start Here | What You Get |
-| --- | --- | --- |
-| Self-hosting for the first time | [Overview & Setup](/en/docs/) · [Configuration Matrix](/en/docs/configuration) | End-to-end Worker deploy, DPAPI secret setup, pinned Node/Docker install, and key rotation |
-| Diagnosing 503, approval, or ACL errors | [Deployment & Runtime FAQ](/en/docs/faq) | Actionable root causes for `/healthz`, `LOCAL_APPROVAL_REQUIRED`, ACL checks, and cleanup lockouts |
-| Integrating MCP clients or auditing security | [OAuth, Tools & Sandbox Contracts](/en/docs/contracts) | Exact HTTP/OAuth limits, 4 scopes, 10 tool schemas, replay ordering, and Docker flags |
-| Tracing internals or changing code | [Architecture & ADRs](/en/docs/architecture) · [Walkthrough](/en/docs/walkthrough) · [Code Map](/en/docs/code-map) | Interactive diagram, security ADRs, 5-step request walkthrough, and source/test file map |
 
 ## Architecture Overview
 
@@ -73,4 +64,11 @@ Configure compatible remote MCP clients with your deployed `PUBLIC_ORIGIN` endpo
 https://<your-bridge-domain>/mcp
 ```
 
-Authorize OAuth consent using the password shown by `%USERPROFILE%\.agentdock-bridge\Password.cmd`, and confirm pending file/command invocations via `Approve.cmd` in the same protected directory. Proceed to [Getting Started & Deployment](/en/docs/).
+## Documentation Guide
+
+::: tip Quick Navigation by Role & Goal
+- **Self-hosting for the first time**: Read [Overview & Setup](/en/docs/) and [Configuration Matrix](/en/docs/configuration) for Worker deployment, DPAPI secret setup, pinned Node/Docker install, and key rotation;
+- **Diagnosing 503, approval, or ACL errors**: See [Deployment & Runtime FAQ](/en/docs/faq) for `/healthz`, `LOCAL_APPROVAL_REQUIRED`, ACL checks, and cleanup lockouts;
+- **Integrating MCP clients or auditing security**: Read [OAuth, Tools & Sandbox Contracts](/en/docs/contracts) for HTTP/OAuth limits, 4 scopes, 10 tool schemas, replay ordering, and Docker flags;
+- **Tracing internals or changing code**: Explore [Architecture & ADRs](/en/docs/architecture), [End-to-End Walkthrough](/en/docs/walkthrough), and [Source & Test Code Map](/en/docs/code-map).
+:::

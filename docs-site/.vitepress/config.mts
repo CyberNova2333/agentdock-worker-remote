@@ -36,7 +36,7 @@ export default defineConfig({
         ],
         sidebar: [
           {
-            text: '1. 起步与配置部署',
+            text: '起步与配置部署',
             items: [
               { text: '项目定位与部署流程', link: '/docs/' },
               { text: '配置矩阵与运维脚本', link: '/docs/configuration' },
@@ -44,13 +44,13 @@ export default defineConfig({
             ],
           },
           {
-            text: '2. 接口与扩展契约',
+            text: '接口与扩展契约',
             items: [
               { text: 'OAuth、工具、批准与沙箱契约', link: '/docs/contracts' },
             ],
           },
           {
-            text: '3. 原理与源码导览',
+            text: '原理与源码导览',
             items: [
               { text: '架构全景与安全决策', link: '/docs/architecture' },
               { text: '一次请求端到端走查', link: '/docs/walkthrough' },
@@ -79,7 +79,7 @@ export default defineConfig({
         ],
         sidebar: [
           {
-            text: '1. Getting Started & Deployment',
+            text: 'Getting Started & Deployment',
             items: [
               { text: 'Overview & Setup Workflow', link: '/en/docs/' },
               { text: 'Configuration & Scripts Matrix', link: '/en/docs/configuration' },
@@ -87,13 +87,13 @@ export default defineConfig({
             ],
           },
           {
-            text: '2. Contracts & Boundaries',
+            text: 'Contracts & Boundaries',
             items: [
               { text: 'OAuth, Tools, Approval & Sandbox', link: '/en/docs/contracts' },
             ],
           },
           {
-            text: '3. Internals & Code Map',
+            text: 'Internals & Code Map',
             items: [
               { text: 'Architecture & Security ADRs', link: '/en/docs/architecture' },
               { text: 'End-to-End Request Walkthrough', link: '/en/docs/walkthrough' },

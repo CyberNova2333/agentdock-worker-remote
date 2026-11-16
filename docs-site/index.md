@@ -7,13 +7,13 @@ hero:
   tagline: 通过 Cloudflare Workers OAuth 2.1 + PKCE 鉴权与中继，在 Windows 受保护连接器执行人工精确批准，并把操作隔离在只读 Linux Docker 沙箱中。
   actions:
     - theme: brand
-      text: 1. 起步与配置部署
+      text: 起步与配置部署
       link: /docs/
     - theme: alt
-      text: 2. 接口与安全契约
+      text: 接口与安全契约
       link: /docs/contracts
     - theme: alt
-      text: 3. 架构与源码导览
+      text: 架构与源码导览
       link: /docs/architecture
     - theme: alt
       text: GitHub 仓库
@@ -27,15 +27,6 @@ features:
   - title: Linux 只读容器与 Windows 守卫
     details: 丢弃多余内核权能、UID/GID 1000、默认断网执行，并拒绝越界符号链接、非法 UTF-16 与剥离自定义 NTFS ACL 的替换。
 ---
-
-## 按身份与目标快速入口
-
-| 你的当前身份 / 目标 | 推荐先读页面 | 将获得的确定答案 |
-| --- | --- | --- |
-| 首次部署个人工作区的开发者 | [项目定位与部署流程](/docs/) · [配置矩阵与脚本](/docs/configuration) | 掌握 Worker、DPAPI 凭据、固定镜像、`.agentdock-bridge` 安装与密码轮换 |
-| 遇到离线 503、待批阻断或清理停机 | [部署与运行排错 FAQ](/docs/faq) | 按 `healthz`、`Approve.cmd`、ACL 报错与 `cleanup_confirmed` 快速定位根因 |
-| 评估权限模型、接入客户端或审计接口 | [OAuth、工具、批准与沙箱契约](/docs/contracts) | 核对端点速率上限、4 个作用域、10 项 MCP 工具限制与容器安全边界 |
-| 阅读源码、追踪端到端链路或准备提交改动 | [架构与安全决策](/docs/architecture) · [请求走查](/docs/walkthrough) · [代码地图](/docs/code-map) | 查看交互式拓扑、历史安全 ADR 与 `cloud/`、`local/`、`container/` 对应测试 |
 
 ## 系统架构全景
 
@@ -69,4 +60,11 @@ pnpm test
 https://<your-bridge-domain>/mcp
 ```
 
-授权页面输入 `%USERPROFILE%\.agentdock-bridge\Password.cmd` 弹窗展示的随机所有者密码后，日常敏感工具调用还须在该私有目录运行 `Approve.cmd` 逐参数确认；完整步骤从[第一步：项目定位与部署流程](/docs/)开始。
+## 文档分层导航
+
+::: tip 按照读者需求快速跳转
+- **首次部署个人工作区的开发者**：阅读 [项目定位与部署流程](/docs/) 与 [配置矩阵与运维脚本](/docs/configuration)，掌握 Worker、DPAPI 凭据、固定镜像、`.agentdock-bridge` 安装与密码轮换；
+- **遇到离线 503、待批阻断或清理停机**：查阅 [部署与运行排错 FAQ](/docs/faq)，按 `healthz`、`Approve.cmd`、ACL 报错与 `cleanup_confirmed` 快速定位根因；
+- **评估权限模型、接入客户端或审计接口**：查阅 [OAuth、工具、批准与沙箱契约](/docs/contracts)，核对端点速率上限、4 个作用域、10 项 MCP 工具限制与容器安全边界；
+- **阅读源码、追踪端到端链路或准备提交改动**：查阅 [架构全景与安全决策](/docs/architecture)、[一次请求端到端走查](/docs/walkthrough) 与 [源码目录与测试地图](/docs/code-map)。
+:::
