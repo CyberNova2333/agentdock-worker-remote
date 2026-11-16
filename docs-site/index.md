@@ -44,17 +44,12 @@ features:
 
 ## 系统架构全景
 
-<div class="archify-diagram-card" style="margin: 1.5rem 0; border: 1px solid var(--vp-c-border); border-radius: 12px; overflow: hidden; background: var(--vp-c-bg-soft); box-shadow: 0 4px 16px rgba(0,0,0,0.06);">
-  <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 18px; background: var(--vp-c-bg-elv); border-bottom: 1px solid var(--vp-c-border); font-size: 13px;">
-    <span style="font-weight: 600; color: var(--vp-c-text-1); display: flex; align-items: center; gap: 8px;">
-      <span>📐</span> AgentDock Bridge 拓扑视图（支持平移、缩放与节点探查）
-    </span>
-    <a href="/diagrams/worker-architecture.html" target="_blank" rel="noreferrer" style="font-size: 12px; color: var(--vp-c-brand-1); text-decoration: none; font-weight: 500;">
-      在新窗口全屏打开 ↗
-    </a>
-  </div>
-  <iframe src="/diagrams/worker-architecture.html" width="100%" height="520px" frameborder="0" style="display: block; border: none;" allowfullscreen loading="lazy"></iframe>
-</div>
+<DiagramFrame
+  src="/diagrams/worker-architecture.html"
+  title="AgentDock Bridge 拓扑视图（支持平移、缩放与节点探查）"
+  aspect="940 / 448"
+  new-tab-label="在新窗口全屏打开 ↗"
+/>
 
 > **实现口径提示**：拓扑图中的外层节点概括了边缘网关到隔离沙箱的四段分工；当前源码实际采用的协议与接口为 `POST /mcp`（JSON-RPC 2.0，而非 SSE 流）、`OAuth 2.1 + PKCE (S256)`、连接器主动发起的 `WSS /bridge` 长连接以及本地经 `Approve.cmd` 确认后的 `docker start --attach` 容器执行。
 

@@ -9,17 +9,12 @@ AgentDock Bridge 的核心结构是**云端无持久文件落地、本地无直�
 
 ## 交互式架构全景
 
-<div class="archify-diagram-card" style="margin: 1.5rem 0; border: 1px solid var(--vp-c-border); border-radius: 12px; overflow: hidden; background: var(--vp-c-bg-soft); box-shadow: 0 4px 16px rgba(0,0,0,0.06);">
-  <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 18px; background: var(--vp-c-bg-elv); border-bottom: 1px solid var(--vp-c-border); font-size: 13px;">
-    <span style="font-weight: 600; color: var(--vp-c-text-1); display: flex; align-items: center; gap: 8px;">
-      <span>📐</span> AgentDock Bridge 拓扑图（支持平移、缩放与节点探查）
-    </span>
-    <a href="/diagrams/worker-architecture.html" target="_blank" rel="noreferrer" style="font-size: 12px; color: var(--vp-c-brand-1); text-decoration: none; font-weight: 500;">
-      在新窗口全屏打开 ↗
-    </a>
-  </div>
-  <iframe src="/diagrams/worker-architecture.html" width="100%" height="520px" frameborder="0" style="display: block; border: none;" allowfullscreen loading="lazy"></iframe>
-</div>
+<DiagramFrame
+  src="/diagrams/worker-architecture.html"
+  title="AgentDock Bridge 拓扑图（支持平移、缩放与节点探查）"
+  aspect="940 / 448"
+  new-tab-label="在新窗口全屏打开 ↗"
+/>
 
 > **图表与当前源码对照说明**：互动图中的区域命名用于概览四段职责；对应当前源码时，外部客户端入口为 `POST /mcp`（标准 HTTP JSON-RPC 2.0 响应，非图中示意的 SSE 实时日志流），身份认证使用 OAuth 2.1 + PKCE（`S256`）与密码代次 Durable Object，反向隧道为连接器主动拨入的 `WSS /bridge`（`Bearer BRIDGE_TOKEN`），实际工作负荷按每次批准运行一次性 `docker create` + `docker start --attach`。
 

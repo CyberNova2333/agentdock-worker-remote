@@ -48,17 +48,12 @@ English documentation pages are translated/synchronized from the authoritative C
 
 ## Architecture Overview
 
-<div class="archify-diagram-card" style="margin: 1.5rem 0; border: 1px solid var(--vp-c-border); border-radius: 12px; overflow: hidden; background: var(--vp-c-bg-soft); box-shadow: 0 4px 16px rgba(0,0,0,0.06);">
-  <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 18px; background: var(--vp-c-bg-elv); border-bottom: 1px solid var(--vp-c-border); font-size: 13px;">
-    <span style="font-weight: 600; color: var(--vp-c-text-1); display: flex; align-items: center; gap: 8px;">
-      <span>📐</span> AgentDock Bridge Topology (pan / zoom / inspect supported)
-    </span>
-    <a href="/diagrams/worker-architecture.html" target="_blank" rel="noreferrer" style="font-size: 12px; color: var(--vp-c-brand-1); text-decoration: none; font-weight: 500;">
-      Open Fullscreen ↗
-    </a>
-  </div>
-  <iframe src="/diagrams/worker-architecture.html" width="100%" height="520px" frameborder="0" style="display: block; border: none;" allowfullscreen loading="lazy"></iframe>
-</div>
+<DiagramFrame
+  src="/diagrams/worker-architecture.html"
+  title="AgentDock Bridge Topology (pan / zoom / inspect supported)"
+  aspect="940 / 448"
+  new-tab-label="Open Fullscreen ↗"
+/>
 
 > **Implementation Note**: The diagram visualizes the four high-level zones from client gateway to sandbox. In actual source code, client RPC uses HTTP `POST /mcp` (JSON-RPC 2.0 rather than SSE log streams), `OAuth 2.1 + PKCE (S256)`, outbound connector WebSocket `WSS /bridge`, and per-invocation `docker start --attach` after `Approve.cmd`.
 
