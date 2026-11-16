@@ -10,14 +10,14 @@ hero:
       text: Getting Started
       link: /en/docs/
     - theme: alt
+      text: API & Tools
+      link: /en/api-reference/
+    - theme: alt
       text: Contracts & Boundaries
       link: /en/docs/contracts
     - theme: alt
       text: Internals & Code Map
       link: /en/docs/architecture
-    - theme: alt
-      text: GitHub Repo
-      link: https://github.com/CyberNova2333/agentdock-worker-remote
 
 features:
   - title: Edge OAuth 2.1 & Password Generations
@@ -30,6 +30,20 @@ features:
 
 ::: warning AI Translation Notice
 English documentation pages are translated/synchronized from the authoritative Chinese source ([简体中文首页](/)) using inspected repository facts. Refer to the Chinese pages or source files if any subtle phrasing differs.
+:::
+
+## Capabilities & Explicit Limits
+
+::: info What AgentDock Bridge Delivers
+- **Authenticated Edge OAuth 2.1 & Outbound WSS**: Separates `AuthCoordinator` and `BridgeRelay` SQLite DOs and dials out over `WSS /bridge` without opening inbound ports on your router.
+- **Per-Parameter `Approve.cmd` & Anti-Replay Ledger**: Every mutating/read/exec call outside `computer_context`, `command_status`, and `stop_command` hashes exact arguments for manual terminal confirmation, unlinking `.approved.json` before recording 24h `RequestReceipts`.
+- **10 Hardened MCP Tools inside Disposable Linux Containers**: Executes inside `--read-only`, `--cap-drop ALL` (`SETUID`/`SETGID`), UID/GID `1000`, and `--network none` containers with `expected_sha256` CAS checks and Windows DACL guards.
+:::
+
+::: warning Explicit Non-Goals & Hard Boundaries
+- **Single-Owner & Windows Host Coupling**: Supports one `owner` and one `/workspace` root with zero multi-tenancy; production DPAPI (`loadSecrets`) and NTFS ACL checks require Windows x64 (`win32`).
+- **Not Blind E2E Encryption**: Cloudflare edge nodes and your upstream AI client platform still observe `/mcp` arguments and outputs, and approved tools intentionally read files inside `/workspace`.
+- **Strict Payload Caps & Cleanup Lockout**: Uses `POST /mcp` JSON-RPC 2.0 (no SSE streams) capped at `1 MiB` ingress / `2 MiB` reply / `110s` deadline; unconfirmed `docker rm -f` halts new tasks until reset.
 :::
 
 ## Architecture Overview

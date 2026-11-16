@@ -10,14 +10,14 @@ hero:
       text: 起步与配置部署
       link: /docs/
     - theme: alt
+      text: API 与组件参考
+      link: /api-reference/
+    - theme: alt
       text: 接口与安全契约
       link: /docs/contracts
     - theme: alt
       text: 架构与源码导览
       link: /docs/architecture
-    - theme: alt
-      text: GitHub 仓库
-      link: https://github.com/CyberNova2333/agentdock-worker-remote
 
 features:
   - title: 边缘 OAuth 2.1 + 代次隔离
@@ -27,6 +27,20 @@ features:
   - title: Linux 只读容器与 Windows 守卫
     details: 丢弃多余内核权能、UID/GID 1000、默认断网执行，并拒绝越界符号链接、非法 UTF-16 与剥离自定义 NTFS ACL 的替换。
 ---
+
+## 能力定位与明确边界
+
+::: info 能做到什么程度（已实现能力）
+- **单人 OAuth 2.1 + PKCE 远程桥接**：云端拆分授权（`AuthCoordinator`）与长连接中继（`BridgeRelay`）双 SQLite DO，通过 `WSS /bridge` 反向连回本机，无需路由器开端口。
+- **逐参数 `Approve.cmd` 与先消费防重放**：除 `computer_context`、`command_status`、`stop_command` 外，全部读写与执行工具须在本机人工确认完整参数 SHA-256 摘要，并先删 `.approved.json` 再记入 24 小时持久账本。
+- **10 项 MCP 工具与只读容器沙箱**：运行于 `--read-only`、`--cap-drop ALL`（仅留 `SETUID`/`SETGID`）、UID/GID `1000`、`--network none` 的一次性 Linux 容器内，并检查 Windows NTFS DACL 与 `expected_sha256` CAS。
+:::
+
+::: warning 明确不能做什么（非目标与硬限制）
+- **单人属主与平台限制**：仅支持单一 `owner` 与单个显式 `/workspace` 挂载，不支持多租户共享；生产凭据 `loadSecrets`（DPAPI）与 Windows ACL 守护明确依赖 Windows x64（Linux/macOS 仅能跑云端与回归测试）。
+- **不是端到端盲传输**：Cloudflare Worker 与上游 AI 客户端平台依然可见经过 `/mcp` 的参数与结果正文，且已批准的工程目录内文件可被工具读取（须自行防范目录内文本提示词注入）。
+- **严格负载上限与清理闭锁**：`POST /mcp`（仅 JSON-RPC 2.0，无 SSE 流）限制入站 `1 MiB` / 回包 `2 MiB` / `110s` 超时；若 `docker rm -f` 清理未获确认，连接器立即闭锁拒接新任务。
+:::
 
 ## 系统架构全景
 

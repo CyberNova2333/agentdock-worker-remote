@@ -14,6 +14,14 @@ Personal authenticated MCP remote bridge: routes remote MCP clients (such as Cha
 - **Fail-Closed Cleanup Guard**: Any unconfirmed `docker rm -f` halts all new file or command operations while keeping `command_status`, `get_command`, and `stop_command` available to the owning client without falsely reporting cleanup success.
 - **Hardened Host Copy & Pinned Toolchain**: Isolates config, secrets, and runtime files into `%USERPROFILE%\.agentdock-bridge`, checks ancestor directory ACLs, DPAPI ciphertexts, and pinned Node 24.22.1 SHA-256 checksums, and clears Node preload/TLS override variables on launch.
 
+## Capabilities & Explicit Non-Goals
+
+| Dimension | What AgentDock Bridge Delivers | Explicit Non-Goals & Hard Bounds |
+| --- | --- | --- |
+| Cloud Auth & Relay | OAuth 2.1 + PKCE S256, zero-script CSP consent HTML, generation-based password invalidation, outbound `WSS /bridge` | **No** multi-tenancy (single `owner` only) or SSE response streaming; Cloudflare & upstream AI platforms see payloads |
+| Local Approval | All tools outside `computer_context`, `command_status`, `stop_command` require `Approve.cmd` over canonical SHA-256 args | `5`-minute pending TTL (`64` queue cap); **zero auto-replay** on `504`; production DPAPI/ACL requires Windows x64 |
+| Tools & Sandbox | 10 MCP tools isolated in `--read-only`, `--cap-drop ALL`, UID `1000`, `--network none` Linux containers | `1 MiB` RPC / `2 MiB` reply / `110s` cap; `<= 1 MiB` file mutations; unconfirmed cleanup locks down new tasks |
+
 ```mermaid
 flowchart LR
   MCPClient["MCP Client (POST /mcp)"] --> Worker["Cloudflare Worker (OAuth 2.1 + BridgeRelay)"]
@@ -77,7 +85,7 @@ Other deployment modes and platform guides:
 | Goal | Docs Site | Source Guide (`repo-docs/`, ZH) |
 | --- | --- | --- |
 | Deploy Worker, configure host, troubleshoot errors | [Getting Started](docs-site/en/docs/index.md) · [Config](docs-site/en/docs/configuration.md) · [FAQ](docs-site/en/docs/faq.md) | [Overview & Verification](repo-docs/README.md) |
-| Inspect OAuth 2.1, tool schemas, approval & sandbox contracts | [Contracts & Boundaries](docs-site/en/docs/contracts.md) | [Cloud](repo-docs/modules/cloud-oauth-and-relay.md) · [Local Approval](repo-docs/modules/local-approval-and-replay.md) · [Container Policy](repo-docs/modules/container-sandbox-and-file-policy.md) |
+| Inspect OAuth 2.1, tool schemas, approval & sandbox contracts | [Contracts & Boundaries](docs-site/en/docs/contracts.md) · [API & Component Reference](docs-site/en/api-reference/index.md) | [Cloud](repo-docs/modules/cloud-oauth-and-relay.md) · [Local Approval](repo-docs/modules/local-approval-and-replay.md) · [Container Policy](repo-docs/modules/container-sandbox-and-file-policy.md) |
 | Follow end-to-end execution, architecture & ADRs | [Architecture & ADRs](docs-site/en/docs/architecture.md) · [Walkthrough](docs-site/en/docs/walkthrough.md) · [Code Map](docs-site/en/docs/code-map.md) | [One Real Run](repo-docs/walkthroughs/one-real-run.md) · [Code Map](repo-docs/code-map.md) · [Glossary](repo-docs/glossary.md) |
 | Audit security fixes, reporting & contributions | [ADRs & Migration](docs-site/en/docs/architecture.md#security-adrs-and-migration) | [Security Fixes](SECURITY-FIXES.md) · [Evidence Audit](repo-docs/references/source-evidence.md) · [Security](SECURITY.md) |
 

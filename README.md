@@ -14,6 +14,14 @@
 - **清理故障安全退守**：一旦容器清理未能确认，连接器立即拒绝后续新任务，同时保留属主客户端对其他已有任务的查询与停止权限，不虚报安全退出。
 - **受保护运行副本与固定工具链**：安装流程把本地运行时与配置隔离到 `%USERPROFILE%\.agentdock-bridge`，校验祖先路径权限、DPAPI 密钥与固定 Node 24.22.1 SHA-256 摘要，并清除 Node 预加载覆盖环境变量。
 
+## 能做到什么程度与明确不能做什么
+
+| 维度 | 能做到什么程度（已实现能力） | 明确不能做什么（非目标与硬限制） |
+| --- | --- | --- |
+| 云端鉴权与连接 | OAuth 2.1 + PKCE S256、零脚本 CSP 同意页、密码改代次批量作废、`WSS /bridge` 反向穿透 | **不支持**多租户共享（仅单一 `owner`）与 SSE 响应流；Cloudflare 与 AI 平台可见传输正文 |
+| 本机人工批准 | 除 `computer_context` / `status` / `stop` 外全部工具须经 `Approve.cmd` 核对完整参数 SHA-256 摘要 | 5 分钟 pending 超时（上限 64 条）；`504` 超时后**不自动重放**未确认写入；生产仅限 Windows x64 DPAPI/ACL |
+| 工具与容器沙箱 | 10 项 MCP 工具运行于 `--read-only` / `--cap-drop ALL` / UID `1000` / `--network none` 一次性容器 | `/mcp` 限入站 `1 MiB` / 回包 `2 MiB` / `110s`；写文件 `<= 1 MiB`；清理未确认即闭锁新任务 |
+
 ```mermaid
 flowchart LR
   MCPClient["MCP 客户端 (POST /mcp)"] --> Worker["Cloudflare Worker (OAuth 2.1 + BridgeRelay)"]
@@ -77,7 +85,7 @@ pnpm run deploy
 | 读者目标 | 文档站入口 | 源码指南入口 |
 | --- | --- | --- |
 | 从零部署、配置参数与排查启动异常 | [起步与配置部署](docs-site/docs/index.md) · [排错 FAQ](docs-site/docs/faq.md) | [开发与运行边界说明](repo-docs/README.md) |
-| 核对 OAuth 2.1、MCP 工具上限与批准契约 | [接口与扩展契约](docs-site/docs/contracts.md) | [云端网关](repo-docs/modules/cloud-oauth-and-relay.md) · [本地批准与账本](repo-docs/modules/local-approval-and-replay.md) · [容器与文件策略](repo-docs/modules/container-sandbox-and-file-policy.md) |
+| 核对 OAuth 2.1、MCP 工具上限与批准契约 | [接口与扩展契约](docs-site/docs/contracts.md) · [API 与组件参考](docs-site/api-reference/index.md) | [云端网关](repo-docs/modules/cloud-oauth-and-relay.md) · [本地批准与账本](repo-docs/modules/local-approval-and-replay.md) · [容器与文件策略](repo-docs/modules/container-sandbox-and-file-policy.md) |
 | 追踪一次请求流转、架构决策与源码改造入口 | [原理与源码导览](docs-site/docs/architecture.md) · [请求走查](docs-site/docs/walkthrough.md) | [一次真实操作走查](repo-docs/walkthroughs/one-real-run.md) · [代码地图](repo-docs/code-map.md) · [术语表](repo-docs/glossary.md) |
 | 审计安全修复快照、漏洞披露与提交规范 | [架构决策与历史对照](docs-site/docs/architecture.md#安全决策与演进迁移) | [修复与验证快照](SECURITY-FIXES.md) · [源码证据审计](repo-docs/references/source-evidence.md) · [安全说明](SECURITY.md) |
 

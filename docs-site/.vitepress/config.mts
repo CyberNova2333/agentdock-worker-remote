@@ -31,8 +31,11 @@ export default defineConfig({
           { text: '首页', link: '/' },
           { text: '起步与部署', link: '/docs/' },
           { text: '契约与边界', link: '/docs/contracts' },
+          { text: 'API 与组件', link: '/api-reference/' },
           { text: '原理与导览', link: '/docs/architecture' },
-          { text: 'GitHub', link: 'https://github.com/CyberNova2333/agentdock-worker-remote' },
+        ],
+        socialLinks: [
+          { icon: 'github', link: 'https://github.com/CyberNova2333/agentdock-worker-remote' },
         ],
         sidebar: [
           {
@@ -47,6 +50,7 @@ export default defineConfig({
             text: '接口与扩展契约',
             items: [
               { text: 'OAuth、工具、批准与沙箱契约', link: '/docs/contracts' },
+              { text: 'API 与组件参考', link: '/api-reference/' },
             ],
           },
           {
@@ -74,8 +78,11 @@ export default defineConfig({
           { text: 'Home', link: '/en/' },
           { text: 'Getting Started', link: '/en/docs/' },
           { text: 'Contracts', link: '/en/docs/contracts' },
+          { text: 'API & Tools', link: '/en/api-reference/' },
           { text: 'Architecture', link: '/en/docs/architecture' },
-          { text: 'GitHub', link: 'https://github.com/CyberNova2333/agentdock-worker-remote' },
+        ],
+        socialLinks: [
+          { icon: 'github', link: 'https://github.com/CyberNova2333/agentdock-worker-remote' },
         ],
         sidebar: [
           {
@@ -90,6 +97,7 @@ export default defineConfig({
             text: 'Contracts & Boundaries',
             items: [
               { text: 'OAuth, Tools, Approval & Sandbox', link: '/en/docs/contracts' },
+              { text: 'API & Component Reference', link: '/en/api-reference/' },
             ],
           },
           {

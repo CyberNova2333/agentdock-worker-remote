@@ -20,6 +20,8 @@ AgentDock Bridge is a **single-owner personal remote MCP gateway**. It connects 
 | Execution Sandbox | Linux container via `desktop-linux` Docker context (`node:24-trixie-slim`, UID/GID `1000`) | Mounts **one** explicit workspace at `/workspace`; approved tools can read/write project-local files |
 
 > **Trust Notice**: Cloudflare and your upstream AI client platform still observe `/mcp` arguments and results in transit. This bridge guarantees that no local action runs without owner OAuth consent and exact `Approve.cmd` confirmation.
+>
+> **Interactive Reference**: Browse every OAuth endpoint, `WSS /bridge` rule, and all 10 MCP tool schemas with explicit bounds in the [API & Component Reference](/en/api-reference/).
 
 ## Prerequisites
 
