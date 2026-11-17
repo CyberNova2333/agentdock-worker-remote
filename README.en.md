@@ -7,7 +7,11 @@
 </p>
 
 <p align="center">
-  <a href="README.md">简体中文</a> · <strong>English</strong> · <a href="https://agentdock-worker-remote.cbnv.me/en/">Live Documentation</a> · <a href="docs-site/en/index.md">Docs Source</a> · <a href="repo-docs/README.md">Source Walkthrough (ZH)</a>
+  <a href="README.md">简体中文</a> | <strong>English</strong>
+</p>
+
+<p align="center">
+  <a href="https://agentdock-worker-remote.cbnv.me/en/">Live Documentation</a> · <a href="docs-site/en/index.md">Docs Source</a> · <a href="repo-docs/README.md">Source Walkthrough (ZH)</a>
 </p>
 
 Personal authenticated MCP remote bridge: routes remote MCP clients (such as ChatGPT) through Cloudflare Workers OAuth 2.1 + PKCE, enforces exact per-request manual approval on a hardened Windows connector, and executes workspace file and command tools inside a read-only Linux Docker container. Production host secret protection relies on Windows DPAPI and NTFS ACLs; non-Windows hosts support Worker deployment, image builds, and cross-platform JS/cloud regression tests.

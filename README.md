@@ -7,7 +7,11 @@
 </p>
 
 <p align="center">
-  <strong>简体中文</strong> · <a href="README.en.md">English</a> · <a href="https://agentdock-worker-remote.cbnv.me/">在线文档站</a> · <a href="docs-site/index.md">文档站源码</a> · <a href="repo-docs/README.md">源码阅读指南</a>
+  <strong>简体中文</strong> | <a href="README.en.md">English</a>
+</p>
+
+<p align="center">
+  <a href="https://agentdock-worker-remote.cbnv.me/">在线文档站</a> · <a href="docs-site/index.md">文档站源码</a> · <a href="repo-docs/README.md">源码阅读指南</a>
 </p>
 
 面向单人开发者的远程 MCP 桥接网关：通过 Cloudflare Workers 完成 OAuth 2.1 + PKCE 鉴权与请求中继，在 Windows 受保护连接器上等待人工逐参数批准后，交由只读 Linux Docker 沙箱执行工作区文件与命令操作。生产宿主强依赖 Windows DPAPI 与 NTFS ACL；非 Windows 系统支持云端 Worker 部署、容器构建与跨平台单元回归。
