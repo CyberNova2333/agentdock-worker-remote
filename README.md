@@ -1,8 +1,14 @@
-# AgentDock Bridge
+<h1 align="center">AgentDock Bridge</h1>
 
-[English](README.en.md) · [在线文档站](https://agentdock-worker-remote.cbnv.me/) · [文档站源码](docs-site/index.md) · [源码阅读指南](repo-docs/README.md)
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-AGPL--3.0--only-blue.svg" alt="License: AGPL-3.0-only" /></a>
+  <a href="package.json"><img src="https://img.shields.io/badge/Node-%3E%3D24-339933.svg" alt="Node &gt;= 24" /></a>
+  <a href="wrangler.jsonc.example"><img src="https://img.shields.io/badge/Runtime-CF%20Worker%20%2B%20Win%20x64%20%2B%20Docker-0969da.svg" alt="Platform" /></a>
+</p>
 
-[![License: AGPL-3.0-only](https://img.shields.io/badge/License-AGPL--3.0--only-blue.svg)](LICENSE) [![Node >= 24](https://img.shields.io/badge/Node-%3E%3D24-339933.svg)](package.json) [![Platform](https://img.shields.io/badge/Runtime-CF%20Worker%20%2B%20Win%20x64%20%2B%20Docker-0969da.svg)](wrangler.jsonc.example)
+<p align="center">
+  <strong>简体中文</strong> · <a href="README.en.md">English</a> · <a href="https://agentdock-worker-remote.cbnv.me/">在线文档站</a> · <a href="docs-site/index.md">文档站源码</a> · <a href="repo-docs/README.md">源码阅读指南</a>
+</p>
 
 面向单人开发者的远程 MCP 桥接网关：通过 Cloudflare Workers 完成 OAuth 2.1 + PKCE 鉴权与请求中继，在 Windows 受保护连接器上等待人工逐参数批准后，交由只读 Linux Docker 沙箱执行工作区文件与命令操作。生产宿主强依赖 Windows DPAPI 与 NTFS ACL；非 Windows 系统支持云端 Worker 部署、容器构建与跨平台单元回归。
 

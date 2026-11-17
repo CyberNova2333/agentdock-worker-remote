@@ -1,8 +1,14 @@
-# AgentDock Bridge
+<h1 align="center">AgentDock Bridge</h1>
 
-[简体中文](README.md) · [Live Documentation](https://agentdock-worker-remote.cbnv.me/en/) · [Docs Source](docs-site/en/index.md) · [Source Walkthrough (ZH)](repo-docs/README.md)
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-AGPL--3.0--only-blue.svg" alt="License: AGPL-3.0-only" /></a>
+  <a href="package.json"><img src="https://img.shields.io/badge/Node-%3E%3D24-339933.svg" alt="Node &gt;= 24" /></a>
+  <a href="wrangler.jsonc.example"><img src="https://img.shields.io/badge/Runtime-CF%20Worker%20%2B%20Win%20x64%20%2B%20Docker-0969da.svg" alt="Runtime" /></a>
+</p>
 
-[![License: AGPL-3.0-only](https://img.shields.io/badge/License-AGPL--3.0--only-blue.svg)](LICENSE) [![Node >= 24](https://img.shields.io/badge/Node-%3E%3D24-339933.svg)](package.json) [![Runtime](https://img.shields.io/badge/Runtime-CF%20Worker%20%2B%20Win%20x64%20%2B%20Docker-0969da.svg)](wrangler.jsonc.example)
+<p align="center">
+  <a href="README.md">简体中文</a> · <strong>English</strong> · <a href="https://agentdock-worker-remote.cbnv.me/en/">Live Documentation</a> · <a href="docs-site/en/index.md">Docs Source</a> · <a href="repo-docs/README.md">Source Walkthrough (ZH)</a>
+</p>
 
 Personal authenticated MCP remote bridge: routes remote MCP clients (such as ChatGPT) through Cloudflare Workers OAuth 2.1 + PKCE, enforces exact per-request manual approval on a hardened Windows connector, and executes workspace file and command tools inside a read-only Linux Docker container. Production host secret protection relies on Windows DPAPI and NTFS ACLs; non-Windows hosts support Worker deployment, image builds, and cross-platform JS/cloud regression tests.
 
