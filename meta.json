@@ -13,8 +13,8 @@
   "featured": true,
   "order": 6,
   "repository": "https://github.com/CyberNova2333/agentdock-worker-remote",
-  "homepage": "https://cybernova2333.github.io/agentdock-worker-remote/",
-  "docsUrl": "https://cybernova2333.github.io/agentdock-worker-remote/docs/",
+  "homepage": "https://agentdock-worker-remote.cbnv.me",
+  "docsUrl": "https://agentdock-worker-remote.cbnv.me/docs/",
   "license": "AGPL-3.0-only",
   "primaryLanguage": "TypeScript",
   "techStack": [
@@ -61,5 +61,5 @@
       "en": "Worker OAuth, local approval connector, and container execution are complete."
     }
   },
-  "updatedAt": "2026-11-11"
+  "updatedAt": "2026-11-17"
 }

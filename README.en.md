@@ -1,6 +1,6 @@
 # AgentDock Bridge
 
-[简体中文](README.md) · [Live Documentation](https://cybernova2333.github.io/agentdock-worker-remote/en/) · [Docs Source](docs-site/en/index.md) · [Source Walkthrough (ZH)](repo-docs/README.md)
+[简体中文](README.md) · [Live Documentation](https://agentdock-worker-remote.cbnv.me/en/) · [Docs Source](docs-site/en/index.md) · [Source Walkthrough (ZH)](repo-docs/README.md)
 
 [![License: AGPL-3.0-only](https://img.shields.io/badge/License-AGPL--3.0--only-blue.svg)](LICENSE) [![Node >= 24](https://img.shields.io/badge/Node-%3E%3D24-339933.svg)](package.json) [![Runtime](https://img.shields.io/badge/Runtime-CF%20Worker%20%2B%20Win%20x64%20%2B%20Docker-0969da.svg)](wrangler.jsonc.example)
 
