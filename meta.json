@@ -61,5 +61,8 @@
       "en": "Worker OAuth, local approval connector, and container execution are complete."
     }
   },
+  "additionalTermsConsent": {
+    "CyberNova": true
+  },
   "updatedAt": "2026-11-17"
 }
