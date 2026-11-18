@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-// This file is part of AgentDock Bridge and is licensed under GNU AGPLv3 with Additional Terms (see LICENSE and ADDITIONAL_TERMS.zh-CN.md; ref: ADDITIONAL_TERMS.en.md).
+// This file is part of AgentDock Bridge and is licensed under GNU AGPLv3 with Additional Terms (see LICENSE and LICENSE-ADDITIONAL_TERMS-zh-CN.md; ref: LICENSE-ADDITIONAL_TERMS-en.md).
 // PID 1 is a small trusted supervisor. Development commands run as uid/gid 1000.
 // Their stdin is never the control pipe; they cannot renew the host's lease.
 import { spawn } from 'node:child_process';
