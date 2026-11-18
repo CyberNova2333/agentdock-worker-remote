@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# This file is part of AgentDock Bridge and is licensed under GNU AGPLv3 with Additional Terms (see LICENSE and ADDITIONAL_TERMS.zh-CN.md; ref: ADDITIONAL_TERMS.en.md).
 # Shared installation checks. This module never reads or prints secret values.
 # A launcher can inherit PowerShell 7's PSModulePath while running Windows
 # PowerShell 5.1. Pin core modules to this executable's own installation.
